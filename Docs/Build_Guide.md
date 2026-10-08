@@ -6,7 +6,7 @@ This guide takes v1 from an empty folder to a submitted entry, in order. It is a
 
 - **Deadline:** Arc Microgrants submissions close **Tue Oct 14, 23:59 ET**. Aim to submit by **Oct 14, 12:00 ET**.
 - **Hard requirements:** a live **Arc mainnet** deployment and a **public repo**. Testnet-only entries, mockups and slide decks are rejected.
-- **Companion docs:** [Specification.md](Specification.md) (what we build) · [Architecture.md](Architecture.md) (how it fits together: stack, data flow, app flow, risks). Section numbers like "Arch §5.3" point into Architecture.md.
+- **Companion docs:** [Specification.md](Specification.md) (what we build) · [Architecture.md](Architecture.md) (how it fits together: stack, data flow, app flow, risks) · [Brand_Design.md](Brand_Design.md) (colours, logo, type). Section numbers like "Arch §5.3" point into Architecture.md.
 
 ---
 
@@ -30,7 +30,7 @@ This guide takes v1 from an empty folder to a submitted entry, in order. It is a
 Full detail lives in Architecture.md. The short version:
 
 ```
- Browser (Next.js + Tailwind + Framer Motion + GSAP + anime.js)
+ Browser (Next.js + Tailwind + Motion + GSAP + anime.js + Iconsax)
     │                         │
     │ wagmi/viem              │ REST
     ▼                         ▼
@@ -79,9 +79,9 @@ Pamo/
 │   └── src/  index.ts · routes/ (vaults, quotes, activity) · earn.ts · indexer.ts · supabase.ts · chain.ts
 ├── web/                        Next.js + TypeScript + Tailwind
 │   ├── app/                    /  /calculator  /portfolios  /app  /app/new  /app/pot/[id]
-│   ├── components/             PotCard, ReviewSheet, TierCard, Stepper, Calculator, …
+│   ├── components/             PotCard, ReviewSheet, TierCard, Stepper, Calculator, Icon, …
 │   ├── lib/                    chain.ts · contract.ts · api.ts · format.ts · growth.ts
-│   └── motion/                 tokens.ts · variants.ts (Framer) · landing.ts (GSAP) · countUp.ts (anime.js)
+│   └── motion/                 tokens.ts · variants.ts (Motion) · landing.ts (GSAP) · countUp.ts (anime.js)
 ├── supabase/schema.sql         tables from Arch §5.3
 ├── Docs/
 └── README.md
@@ -91,7 +91,8 @@ Pamo/
 |---|---|
 | Contracts | Solidity + **Arc Foundry** (`arc-forge`, `arc-cast`, `arc-anvil`) + OpenZeppelin |
 | Frontend | Next.js (App Router) + TypeScript + Tailwind CSS |
-| Motion | **Framer Motion** (UI) · **GSAP + ScrollTrigger** (landing) · **anime.js** (number count-ups, logo tone marks) |
+| Motion | **Motion** ([motion.dev](https://motion.dev), npm `motion`) (UI) · **GSAP + ScrollTrigger** (landing) · **anime.js** (npm `animejs`) (number count-ups, logo tone marks) |
+| Icons | **Iconsax** (npm `iconsax-react`) |
 | Wallet + chain | wagmi + viem + TanStack Query, Arc as a custom chain |
 | Charts / validation | Recharts · zod |
 | Backend | Node.js + Express + TypeScript, viem for the indexer |
@@ -189,7 +190,20 @@ Endpoints, schema and indexer pseudocode: **Arch §5**.
 - **Name:** plain **Pamo** everywhere. Only the logo carries the tone marks: **Pamọ́**, in plain black text on white with no background block.
 - **Tagline:** *Keep it safe.* The Yoruba origin (*fi pamọ́*, "keep it safe") is a one-line backstory on the landing page.
 - **Feel:** calm, trustworthy, plain-spoken. Money apps earn trust by being boring in the right places.
-- **Colours (starting point):** deep green `#0F3D2E` (primary), warm off-white `#FAF7F0` (background), ink `#1E1E1E` (text), soft gold `#E9B949` (earned amounts). Tiers: Calm `#7FB7A4`, Steady `#4A8FC9`, Bold `#E07A5F`. Defined once as Tailwind theme tokens.
+- **Colours:** three brand colours, white first. Full rules, helpers and tokens are in [Brand_Design.md](Brand_Design.md).
+
+  | Colour | Hex | Used for |
+  |---|---|---|
+  | **White** | `#FFFFFF` | Page and card backgrounds (most of every screen) |
+  | **Black** | `#0A0A0A` | Text, numbers, the logo, dark sections |
+  | **Pamo green** | `#0B7A4B` | Buttons, links, progress, earned amounts |
+  | Bright green (helper) | `#3DDC84` | Green text and marks on black only |
+  | Mint (helper) | `#E6F4EC` | Soft fills behind green text |
+
+- **Green is rare:** one green button per screen, and green text only for links and earned amounts.
+- **Tiers:** Calm, Steady and Bold are not separate colours. Each shows its name plus a level mark with 1, 2 or 3 bars filled in Pamo green.
+- **Status:** errors and cautions have their own colours, used only for that (Brand_Design.md §2).
+- **Tokens:** every colour is defined once as a Tailwind theme token (Brand_Design.md §8). No screen writes a hex value directly.
 - **Type:** one clean sans (e.g. Inter); tabular figures for every amount.
 
 ### Copy rules
@@ -210,7 +224,7 @@ Endpoints, schema and indexer pseudocode: **Arch §5**.
 - Footer: "Live on Arc mainnet", contract address linked to the explorer, GitHub link.
 
 **2. Dashboard** (`/app`)
-- Top: **Total saved** (big), **Earned so far** (gold), live APY per tier.
+- Top: **Total saved** (big), **Earned so far** (green), live APY per tier.
 - Pot cards: name, kind badge, tier chip, value, earned. Goal pots add a progress bar and "unlocks Oct 30".
 - Buttons: **New Anytime Vault**, **New Goal**. Empty state: "Nothing saved yet. Start with any amount."
 
@@ -296,11 +310,13 @@ Motion in a money app should feel **calm and certain**, never flashy. It explain
 
 | Library | Its only job | Loaded where |
 |---|---|---|
-| **Framer Motion** | Everything inside the app UI: page transitions, stepper, review sheet, cards, progress bars, buttons, success state | App-wide |
+| **Motion** ([motion.dev](https://motion.dev)) | Everything inside the app UI: page transitions, stepper, review sheet, cards, progress bars, buttons, success state, icon transitions | App-wide, imported from `motion/react` |
 | **GSAP + ScrollTrigger** | Landing page only: hero timeline and scroll storytelling | Dynamic import on `/` only, so it never weighs on `/app` |
 | **anime.js** | Number count-ups (total saved, earned, calculator result) and the logo tone-mark animation | Small helper in `web/motion/countUp.ts` |
 
-Never animate one element with two libraries. If phones struggle (risk #10), drop anime.js first: Framer Motion can do the count-ups.
+Never animate one element with two libraries. If phones struggle (risk #10), drop anime.js first: Motion can do the count-ups.
+
+Motion is the library that used to be called Framer Motion. Install the `motion` package and import from `motion/react`, not the old `framer-motion` package.
 
 ### 7.2 Motion tokens (`web/motion/tokens.ts`)
 
@@ -323,27 +339,37 @@ Never animate one element with two libraries. If phones struggle (risk #10), dro
 | Landing | How it works | GSAP ScrollTrigger | As you scroll, a USDC dot travels wallet → Pamo → vault → back with interest |
 | Landing | Feature cards | GSAP ScrollTrigger | Cards rise in with a short stagger |
 | Landing | Calculator teaser | anime.js | Example balance counts up when it scrolls into view |
-| All pages | Route change | Framer (`AnimatePresence`) | Fade + 8 px rise, `base` |
+| All pages | Route change | Motion (`AnimatePresence`) | Fade + 8 px rise, `base` |
 | Dashboard | Total saved, earned | anime.js | Count up from 0 on first load; from old to new value after a transaction |
-| Dashboard | Pot cards | Framer | Stagger in on load; gentle lift on hover; new pot slides in highlighted |
-| Dashboard / pot | Goal progress bar | Framer | Width springs to the new percentage, `slow` |
-| Dashboard / portfolios | Live APY dot | Framer | Slow, subtle pulse to show the rate is live |
-| New pot | Stepper | Framer | Steps slide left / right by direction; progress dots fill |
-| New pot | Tier cards | Framer (`layoutId`) | The selection outline glides from card to card |
-| Review | Review sheet | Framer | Slides up as a bottom sheet on phones, fades in as a modal on desktop, `spring` |
-| Review | Warnings | Framer | Fade in above the button before it becomes active |
-| Review | Allow → Save | Framer | Step 1 ticks off, step 2 becomes active |
-| Any button | Pending transaction | Framer | Label swaps to a small spinner; width doesn't jump |
-| Success | Confirmation | Framer | A check mark draws itself (SVG path), then the new balance counts up (anime.js) |
+| Dashboard | Pot cards | Motion | Stagger in on load; gentle lift on hover; new pot slides in highlighted |
+| Dashboard / pot | Goal progress bar | Motion | Width springs to the new percentage, `slow` |
+| Dashboard / portfolios | Live APY dot | Motion | Slow, subtle pulse to show the rate is live |
+| New pot | Stepper | Motion | Steps slide left / right by direction; progress dots fill |
+| New pot | Tier cards | Motion (`layoutId`) | The selection outline glides from card to card |
+| Review | Review sheet | Motion | Slides up as a bottom sheet on phones, fades in as a modal on desktop, `spring` |
+| Review | Warnings | Motion | Fade in above the button before it becomes active |
+| Review | Allow → Save | Motion | Step 1 ticks off, step 2 becomes active |
+| Any button | Pending transaction | Motion | Label swaps to a small spinner; width doesn't jump |
+| Success | Confirmation | Motion | A check mark draws itself (SVG path), then the new balance counts up (anime.js) |
 | Calculator | Result number | anime.js | Counts to the new value as inputs change (debounced) |
 | Calculator | Curve | Recharts | Built-in line animation on first draw; instant updates after that |
-| Errors | Error message | Framer | Short fade in with a small shake on the field, `fast` |
+| Errors | Error message | Motion | Short fade in with a small shake on the field, `fast` |
+| Any screen | Icons that change state | Motion | Old icon fades out as the new one fades in (copy → tick, eye → eye-slash), `fast` |
 
 ### 7.4 Rules
 
-- **Reduced motion is respected everywhere:** Framer `useReducedMotion`, GSAP `matchMedia("(prefers-reduced-motion: reduce)")`, and anime.js jumps straight to the final value. With reduced motion on, nothing moves except opacity.
+- **Reduced motion is respected everywhere:** Motion `useReducedMotion`, GSAP `matchMedia("(prefers-reduced-motion: reduce)")`, and anime.js jumps straight to the final value. With reduced motion on, nothing moves except opacity.
 - **Animate `transform` and `opacity` only** (no width/height/top/left), except the progress bar, which uses `scaleX`.
 - **Never block input:** the user can click through any animation; count-ups never hide the real number from screen readers (put the final value in `aria-label`).
+
+### 7.5 Icons
+
+All icons come from **Iconsax** (`iconsax-react`), so the whole app shares one drawing style.
+
+- **One wrapper:** `web/components/Icon.tsx` re-exports the icons Pamo uses and sets the defaults (size 20, `currentColor`). Screens import from the wrapper, never from `iconsax-react` directly.
+- **Two variants only:** `Linear` by default, `Bold` for the selected or active state (current tab, chosen tier). Don't mix in the other Iconsax variants.
+- **Icons don't animate themselves:** Iconsax ships static SVGs. When an icon needs to move, wrap it in a Motion element (§7.3) and follow the same tokens and reduced-motion rules.
+- **Meaning never rests on an icon alone:** pair it with a text label, or give icon-only buttons an `aria-label`.
 - **Money truth first:** an animated number always ends on the exact value read from the chain.
 - **Budget:** landing hero under 1.2 s; in-app transitions at or under 250 ms.
 
@@ -410,11 +436,13 @@ Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. 
 
 ### Phase 5: Design system + motion (Oct 11)
 
-- [ ] Tailwind theme tokens: colours, type, spacing, radii (§6 Brand)
+- [ ] Tailwind theme tokens: colours, type, spacing, radii (§6 Brand, Brand_Design.md §8)
 - [ ] Apply the brand to every screen: logo, tier chips, cards, sheet
-- [ ] `web/motion/`: `tokens.ts`, Framer `variants.ts`, anime.js `countUp.ts`
-- [ ] Framer Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3)
+- [ ] Install `motion`, `animejs`, `iconsax-react` in `web/`
+- [ ] `web/motion/`: `tokens.ts`, Motion `variants.ts`, anime.js `countUp.ts`
+- [ ] Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3)
 - [ ] anime.js: total saved / earned count-ups, calculator result
+- [ ] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5)
 - [ ] Reduced-motion support in all three libraries (§7.4)
 - [ ] All error and empty states (§6)
 
@@ -461,6 +489,8 @@ At the end of each day, ask: *if I had to submit right now, what would I show?* 
 | Backend host | Railway or Render: pick whichever has the faster cold start in test #9 | Open |
 | Keep anime.js | Keep unless phone test #10 shows jank | Open |
 | Logo tone-mark spelling | Pamọ́, plain black on white | ✅ Confirmed |
+| Brand colours | White first, black, Pamo green `#0B7A4B` (Brand_Design.md) | ✅ Confirmed |
+| Typeface | One sans that draws ọ́ well; Inter as placeholder | Open |
 
 ---
 

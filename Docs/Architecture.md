@@ -21,9 +21,10 @@ How Pamo is put together: the stack, the system parts, how data moves, how the a
 | **Language** | TypeScript | Everywhere outside Solidity: frontend and backend |
 | **Frontend framework** | Next.js (App Router) | Pages, routing, server rendering for the landing page |
 | **Styling** | Tailwind CSS | Design tokens (colours, type, spacing), responsive layout |
-| **UI motion** | Framer Motion | Component transitions: modals, review sheet, pot cards, page changes |
+| **UI motion** | Motion ([motion.dev](https://motion.dev), npm `motion`) | Component transitions: modals, review sheet, pot cards, page changes, icon state changes |
 | **Scroll / hero motion** | GSAP (+ ScrollTrigger) | Landing page hero and scroll storytelling only |
-| **Micro-animation** | anime.js | Number count-ups (balances, "earned"), small SVG touches, the logo tone marks |
+| **Micro-animation** | anime.js (npm `animejs`) | Number count-ups (balances, "earned"), small SVG touches, the logo tone marks |
+| **Icons** | Iconsax (npm `iconsax-react`) | One icon set for the whole app: `Linear` by default, `Bold` for active states |
 | **Wallet + chain** | wagmi + viem | Wallet connection, Arc as a custom chain, contract reads and writes, gas estimates |
 | **Data fetching** | TanStack Query (comes with wagmi) | Caching and refreshing chain and API data |
 | **Charts** | Recharts | Growth Calculator curve |
@@ -41,7 +42,7 @@ How Pamo is put together: the stack, the system parts, how data moves, how the a
 | **Backend hosting** | Railway or Render (pick one on day 1) | Express API + indexer worker |
 | **Repo** | GitHub (public) | Required by the Microgrants rules |
 
-**Motion libraries, one job each.** Three animation libraries overlap a lot, and each adds weight on phones. Give each a single job (above) and never use two for the same element. If time gets tight, anime.js is the first to drop, since Framer Motion can do count-ups too.
+**Motion libraries, one job each.** Three animation libraries overlap a lot, and each adds weight on phones. Give each a single job (above) and never use two for the same element. If time gets tight, anime.js is the first to drop, since Motion can do count-ups too. Motion is the library formerly called Framer Motion: install `motion` and import from `motion/react`. Iconsax icons are static SVGs, so any icon movement is done by wrapping the icon in a Motion element.
 
 ### 1.2 Roadmap (after v1)
 
@@ -83,7 +84,8 @@ How Pamo is put together: the stack, the system parts, how data moves, how the a
 │ FRONTEND  ·  Next.js + TypeScript + Tailwind  ·  hosted on Vercel          │
 │                                                                            │
 │  Pages: /  /calculator  /portfolios  /app  /app/new  /app/pot/[id]         │
-│  Motion: Framer Motion (UI) · GSAP (landing) · anime.js (numbers)          │
+│  Motion: Motion (UI) · GSAP (landing) · anime.js (numbers)                 │
+│  Icons: Iconsax                                                            │
 │  wagmi + viem: wallet, reads, writes, gas estimates                        │
 └──────────┬───────────────────────────────────────────┬─────────────────────┘
            │ REST (JSON)                               │ JSON-RPC (reads + signed txs)
@@ -146,14 +148,14 @@ Pamo/
 │   └── .env                       never committed
 ├── web/                           Next.js + TypeScript + Tailwind
 │   ├── app/                       routes (see §6)
-│   ├── components/                PotCard, ReviewSheet, TierCard, Calculator, …
+│   ├── components/                PotCard, ReviewSheet, TierCard, Calculator, Icon, …
 │   ├── lib/
 │   │   ├── chain.ts               Arc custom chain for wagmi/viem
 │   │   ├── contract.ts            ABI + address
 │   │   ├── api.ts                 typed calls to Express
 │   │   ├── format.ts              USDC 6-dp formatting, APY, dates
 │   │   └── growth.ts              calculator maths
-│   └── motion/                    Framer variants, GSAP timelines, anime.js helpers
+│   └── motion/                    Motion variants, GSAP timelines, anime.js helpers
 ├── supabase/
 │   └── schema.sql                 tables in §5.3
 ├── Docs/
