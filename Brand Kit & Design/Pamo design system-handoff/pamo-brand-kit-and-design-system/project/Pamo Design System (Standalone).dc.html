@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700&display=swap" rel="stylesheet">
+<template id="__bundler_thumbnail"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="#0A0A0A"></rect><text x="50" y="64" font-family="sans-serif" font-size="44" font-weight="700" fill="#FFFFFF" text-anchor="middle">P</text></svg></template>
+<style>
+body{margin:0;background:#FFFFFF;color:#0A0A0A;-webkit-font-smoothing:antialiased}
+a{color:#0B7A4B;text-underline-offset:3px}
+a:hover{color:#096640}
+*{box-sizing:border-box}
+@keyframes pspin{to{transform:rotate(360deg)}}
+@keyframes pshim{0%{opacity:1}50%{opacity:.5}100%{opacity:1}}
+</style>
+</helmet>
+<div style="font-family:'Be Vietnam Pro',system-ui,sans-serif; max-width:1200px; margin:0 auto; padding:48px 32px 96px">
+<header style="display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; padding-bottom:24px; border-bottom:1px solid #DCE2DD">
+  <div style="font-size:24px; font-weight:700">Pamọ́</div>
+  <div style="display:flex; gap:8px 24px; font-size:14px; color:#5A655E; flex-wrap:wrap; white-space:nowrap">
+    <span style="color:#0A0A0A; font-weight:600">Design system</span>
+    <span>v1 · Oct 7, 2026</span>
+  </div>
+</header>
+<section style="padding:72px 0 48px; display:grid; gap:12px">
+  <h1 style="margin:0; font-size:48px; line-height:56px; letter-spacing:-0.02em">Design system</h1>
+  <p style="margin:0; font-size:18px; line-height:28px; color:#5A655E; max-width:640px">Foundations and components for the Pamo web app. Each component shows its states side by side and one rule for when to use it.</p>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:40px">
+  <h2 style="margin:0; font-size:32px; line-height:40px">Foundations</h2>
+  <div style="display:grid; gap:16px">
+    <h3 style="margin:0; font-size:20px; line-height:28px">Spacing · 4 px base</h3>
+    <div style="display:flex; gap:24px; flex-wrap:wrap; align-items:flex-end">
+      <sc-for list="{{ space }}" as="s" hint-placeholder-count="10">
+        <div style="display:grid; gap:8px; justify-items:start">
+          <div style="width:{{ s.px }}; height:{{ s.px }}; background:#0A0A0A; border-radius:2px"></div>
+          <span style="font-size:12px; color:#5A655E">{{ s.name }} · {{ s.v }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:16px">
+    <div style="display:grid; gap:10px"><div style="height:96px; border:1px solid #DCE2DD; border-radius:8px"></div><b style="font-size:14px">radius-sm · 8</b><span style="font-size:13px; color:#5A655E">Chips, badges, inputs</span></div>
+    <div style="display:grid; gap:10px"><div style="height:96px; border:1px solid #DCE2DD; border-radius:16px"></div><b style="font-size:14px">radius-card · 16</b><span style="font-size:13px; color:#5A655E">Cards, banners</span></div>
+    <div style="display:grid; gap:10px"><div style="height:96px; border:1px solid #DCE2DD; border-radius:24px 24px 0 0"></div><b style="font-size:14px">radius-sheet · 24</b><span style="font-size:13px; color:#5A655E">Sheets and modals</span></div>
+    <div style="display:grid; gap:10px"><div style="height:96px; border:1px solid #DCE2DD; border-radius:999px"></div><b style="font-size:14px">radius-full</b><span style="font-size:13px; color:#5A655E">Buttons, address chip</span></div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); gap:16px">
+    <div style="display:grid; gap:10px"><div style="height:120px; border:1px solid #DCE2DD; border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:14px">1 px grey line</div><b style="font-size:14px">Border · default</b><span style="font-size:13px; color:#5A655E">Cards use a thin border, never a shadow.</span></div>
+    <div style="display:grid; gap:10px"><div style="height:120px; background:#F5F7F5; border-radius:16px; display:flex; align-items:center; justify-content:center"><div style="background:#FFFFFF; border-radius:16px; padding:20px 28px; box-shadow:0 8px 32px rgba(10,10,10,0.10); font-size:14px">shadow-sheet</div></div><b style="font-size:14px">Shadow · sheets and modals only</b><span style="font-size:13px; color:#5A655E">0 8 32 rgba(10,10,10,.10). The one shadow.</span></div>
+    <div style="display:grid; gap:10px"><div style="height:120px; border:1px solid #DCE2DD; border-radius:16px; display:flex; align-items:center; justify-content:center; gap:16px"><div style="width:30px; height:56px; border:2px solid #0A0A0A; border-radius:6px"></div><div style="width:96px; height:56px; border:2px solid #0A0A0A; border-radius:6px"></div></div><b style="font-size:14px">Breakpoints</b><span style="font-size:13px; color:#5A655E">Phone 390 (1 col, 16 margin) · Desktop 1440 (12 col, 1200 max)</span></div>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:32px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Buttons</h2><p style="margin:0; font-size:15px; color:#5A655E">Primary is the one main action on a screen. Secondary for alternatives. Text for low-weight actions. Height 48, full width on phone.</p></div>
+  <div style="display:grid; grid-template-columns:120px repeat(5,minmax(160px,1fr)); gap:16px 20px; align-items:center; overflow-x:auto">
+    <span></span>
+    <sc-for list="{{ btnStates }}" as="h" hint-placeholder-count="5"><span style="font-size:12px; color:#5A655E">{{ h }}</span></sc-for>
+    <b style="font-size:14px">Primary</b>
+    <div style="height:48px; padding:0 24px; border-radius:999px; background:#0B7A4B; color:#FFFFFF; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; width:160px">Start saving</div>
+    <div style="height:48px; padding:0 24px; border-radius:999px; background:#096640; color:#FFFFFF; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; width:160px">Start saving</div>
+    <div style="height:48px; padding:0 24px; border-radius:999px; background:#096640; color:#FFFFFF; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; width:160px; transform:scale(0.98)">Start saving</div>
+    <div style="height:48px; padding:0 24px; border-radius:999px; background:#DCE2DD; color:#8A948D; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; width:160px">Start saving</div>
+    <div style="height:48px; border-radius:999px; background:#0B7A4B; display:flex; align-items:center; justify-content:center; width:160px">{{ spinW }}</div>
+    <b style="font-size:14px">Secondary</b>
+    <div style="height:48px; border-radius:999px; border:1.5px solid #0A0A0A; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; width:160px">Add money</div>
+    <div style="height:48px; border-radius:999px; border:1.5px solid #0A0A0A; background:#F5F7F5; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; width:160px">Add money</div>
+    <div style="height:48px; border-radius:999px; border:1.5px solid #0A0A0A; background:#DCE2DD; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; width:160px">Add money</div>
+    <div style="height:48px; border-radius:999px; border:1.5px solid #DCE2DD; color:#8A948D; font-size:15px; font-weight:600; display:flex; align-items:center; justify-content:center; width:160px">Withdraw</div>
+    <div style="height:48px; border-radius:999px; border:1.5px solid #0A0A0A; display:flex; align-items:center; justify-content:center; width:160px">{{ spinB }}</div>
+    <b style="font-size:14px">Text</b>
+    <span style="font-size:15px; font-weight:600; color:#0B7A4B">See all activity</span>
+    <span style="font-size:15px; font-weight:600; color:#096640; text-decoration:underline">See all activity</span>
+    <span style="font-size:15px; font-weight:600; color:#096640">See all activity</span>
+    <span style="font-size:15px; font-weight:600; color:#8A948D">See all activity</span>
+    <span style="font-size:13px; color:#5A655E">—</span>
+  </div>
+  <p style="margin:0; font-size:13px; color:#5A655E">Loading swaps the label for a 20 px spinner at a fixed width, so the button never resizes.</p>
+</section>
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:32px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Inputs</h2><p style="margin:0; font-size:15px; color:#5A655E">Amount input for any USDC value; always shows the unit. Text and date fields for Goal setup. Height 56, radius 8.</p></div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:24px">
+    <div style="display:grid; gap:8px"><span style="font-size:12px; color:#5A655E">Empty</span><b style="font-size:14px">Amount</b><div style="height:56px; border:1px solid #DCE2DD; border-radius:8px; padding:0 16px; display:flex; align-items:center; gap:8px"><span style="flex:1; font-size:20px; color:#8A948D">0.00</span><span style="font-size:14px; font-weight:600; color:#5A655E">USDC</span><span style="font-size:13px; font-weight:600; color:#0B7A4B; background:#E6F4EC; padding:4px 10px; border-radius:8px">Max</span></div><span style="font-size:13px; color:#5A655E">Wallet: 1,024.00 USDC</span></div>
+    <div style="display:grid; gap:8px"><span style="font-size:12px; color:#5A655E">Filled</span><b style="font-size:14px">Amount</b><div style="height:56px; border:1px solid #0A0A0A; border-radius:8px; padding:0 16px; display:flex; align-items:center; gap:8px"><span style="flex:1; font-size:20px; font-weight:600; font-variant-numeric:tabular-nums">500.00</span><span style="font-size:14px; font-weight:600; color:#5A655E">USDC</span><span style="font-size:13px; font-weight:600; color:#0B7A4B; background:#E6F4EC; padding:4px 10px; border-radius:8px">Max</span></div><span style="font-size:13px; color:#5A655E">Wallet: 1,024.00 USDC</span></div>
+    <div style="display:grid; gap:8px"><span style="font-size:12px; color:#5A655E">Focused</span><b style="font-size:14px">Amount</b><div style="height:56px; border:2px solid #0B7A4B; border-radius:8px; padding:0 15px; display:flex; align-items:center; gap:8px; box-shadow:0 0 0 3px #E6F4EC"><span style="flex:1; font-size:20px; font-weight:600; font-variant-numeric:tabular-nums">500<span style="border-left:2px solid #0A0A0A; margin-left:1px"></span></span><span style="font-size:14px; font-weight:600; color:#5A655E">USDC</span><span style="font-size:13px; font-weight:600; color:#0B7A4B; background:#E6F4EC; padding:4px 10px; border-radius:8px">Max</span></div><span style="font-size:13px; color:#5A655E">Wallet: 1,024.00 USDC</span></div>
+    <div style="display:grid; gap:8px"><span style="font-size:12px; color:#5A655E">Error</span><b style="font-size:14px">Amount</b><div style="height:56px; border:2px solid #B3261E; border-radius:8px; padding:0 15px; display:flex; align-items:center; gap:8px"><span style="flex:1; font-size:20px; font-weight:600; font-variant-numeric:tabular-nums">2,000.00</span><span style="font-size:14px; font-weight:600; color:#5A655E">USDC</span><span style="font-size:13px; font-weight:600; color:#0B7A4B; background:#E6F4EC; padding:4px 10px; border-radius:8px">Max</span></div><span style="font-size:13px; color:#B3261E; font-weight:600">✕ More than your 1,024.00 USDC</span></div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:24px">
+    <div style="display:grid; gap:8px"><b style="font-size:14px">Pot name</b><div style="height:56px; border:1px solid #DCE2DD; border-radius:8px; padding:0 16px; display:flex; align-items:center; font-size:16px; color:#8A948D">e.g. Rent</div></div>
+    <div style="display:grid; gap:8px"><b style="font-size:14px">Pot name</b><div style="height:56px; border:1px solid #0A0A0A; border-radius:8px; padding:0 16px; display:flex; align-items:center; font-size:16px">New laptop</div></div>
+    <div style="display:grid; gap:8px"><b style="font-size:14px">Unlock date</b><div style="height:56px; border:1px solid #0A0A0A; border-radius:8px; padding:0 16px; display:flex; align-items:center; justify-content:space-between; font-size:16px"><span>Mar 1, 2027</span><span style="width:20px; height:20px; border:1.5px solid #0A0A0A; border-radius:4px"></span></div></div>
+    <div style="display:grid; gap:8px"><b style="font-size:14px">Unlock date</b><div style="height:56px; border:2px solid #B3261E; border-radius:8px; padding:0 15px; display:flex; align-items:center; justify-content:space-between; font-size:16px"><span>Sep 1, 2026</span><span style="width:20px; height:20px; border:1.5px solid #0A0A0A; border-radius:4px"></span></div><span style="font-size:13px; color:#B3261E; font-weight:600">✕ Pick a date after today</span></div>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:32px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Chips and badges</h2><p style="margin:0; font-size:15px; color:#5A655E">Tier chip names the portfolio with its level mark. Kind badge names the vault type. Neither is clickable.</p></div>
+  <div style="display:flex; gap:12px; flex-wrap:wrap; align-items:center">
+    <sc-for list="{{ tiers }}" as="t" hint-placeholder-count="3">
+      <span style="display:inline-flex; align-items:center; gap:8px; background:#E6F4EC; padding:6px 10px; border-radius:8px">
+        <span style="display:inline-flex; align-items:flex-end; gap:2px; height:12px"><span style="width:3px; height:6px; border-radius:1px; background:{{ t.b1 }}"></span><span style="width:3px; height:9px; border-radius:1px; background:{{ t.b2 }}"></span><span style="width:3px; height:12px; border-radius:1px; background:{{ t.b3 }}"></span></span>
+        <span style="font-size:13px; font-weight:600">{{ t.name }}</span>
+      </span>
+    </sc-for>
+    <span style="width:1px; height:24px; background:#DCE2DD; margin:0 8px"></span>
+    <span style="font-size:13px; font-weight:600; border:1px solid #DCE2DD; padding:5px 10px; border-radius:8px">Anytime</span>
+    <span style="font-size:13px; font-weight:600; border:1px solid #DCE2DD; padding:5px 10px; border-radius:8px">Goal</span>
+    <span style="font-size:13px; font-weight:600; color:#8A5A00; background:#FFF4DC; padding:6px 10px; border-radius:8px">Locked</span>
+    <span style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; border:1px solid #DCE2DD; padding:6px 12px; border-radius:999px"><span style="width:8px; height:8px; border-radius:50%; background:#0B7A4B"></span>0x71C4…9A3f</span>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:32px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Tier card</h2><p style="margin:0; font-size:15px; color:#5A655E">For picking a portfolio. One is always selected; selection shows a 2 px black border and a filled check, not a colour fill.</p></div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:16px">
+    <sc-for list="{{ tierCards }}" as="t" hint-placeholder-count="3">
+      <div style="border:{{ t.border }}; border-radius:16px; padding:20px; display:grid; gap:12px">
+        <div style="display:flex; justify-content:space-between; align-items:center">
+          <span style="display:inline-flex; align-items:center; gap:10px"><span style="display:inline-flex; align-items:flex-end; gap:2px; height:14px"><span style="width:4px; height:7px; border-radius:1px; background:{{ t.b1 }}"></span><span style="width:4px; height:10px; border-radius:1px; background:{{ t.b2 }}"></span><span style="width:4px; height:14px; border-radius:1px; background:{{ t.b3 }}"></span></span><b style="font-size:18px">{{ t.name }}</b></span>
+          <span style="width:22px; height:22px; border-radius:50%; border:{{ t.radio }}; background:{{ t.radioBg }}; color:#FFFFFF; font-size:12px; display:flex; align-items:center; justify-content:center">{{ t.check }}</span>
+        </div>
+        <div style="font-size:24px; font-weight:700; font-variant-numeric:tabular-nums">{{ t.apy }} <span style="font-size:13px; font-weight:400; color:#5A655E">APY today</span></div>
+        <span style="font-size:14px; line-height:20px; color:#5A655E">{{ t.note }}</span>
+        <span style="font-size:12px; color:#5A655E">{{ t.state }}</span>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:32px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Pot card and stats</h2><p style="margin:0; font-size:15px; color:#5A655E">Pot cards list a user’s pots on the dashboard. Goal pots add progress and the unlock date. Stat block sits at the top of the dashboard.</p></div>
+  <div style="display:flex; gap:48px; flex-wrap:wrap; padding:24px 0">
+    <div style="display:grid; gap:4px"><span style="font-size:14px; color:#5A655E">Total saved</span><span style="font-size:48px; line-height:56px; font-weight:700; letter-spacing:-0.02em; font-variant-numeric:tabular-nums">3,300.75 <span style="font-size:20px; color:#5A655E">USDC</span></span></div>
+    <div style="display:grid; gap:4px"><span style="font-size:14px; color:#5A655E">Earned so far</span><span style="font-size:32px; line-height:56px; font-weight:700; color:#0B7A4B; font-variant-numeric:tabular-nums">+44.44 USDC</span></div>
+  </div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:16px">
+    <sc-for list="{{ pots }}" as="p" hint-placeholder-count="3">
+      <div style="border:1px solid #DCE2DD; border-radius:16px; padding:20px; display:grid; gap:16px; align-content:start">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px"><b style="font-size:18px">{{ p.name }}</b><span style="font-size:12px; font-weight:600; border:1px solid #DCE2DD; padding:3px 8px; border-radius:8px">{{ p.kind }}</span></div>
+        <div style="display:grid; gap:2px"><span style="font-size:28px; font-weight:700; font-variant-numeric:tabular-nums">{{ p.value }} <span style="font-size:14px; color:#5A655E">USDC</span></span><span style="font-size:14px; color:#5A655E; font-variant-numeric:tabular-nums">{{ p.of }}</span></div>
+        <sc-if value="{{ p.goal }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; gap:8px"><div style="height:6px; border-radius:3px; background:#DCE2DD; overflow:hidden"><div style="height:6px; width:{{ p.pct }}; background:#0B7A4B"></div></div><span style="font-size:13px; color:#5A655E">{{ p.pctLabel }} · Unlocks {{ p.unlock }}</span></div>
+        </sc-if>
+        <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #DCE2DD">
+          <span style="display:inline-flex; align-items:center; gap:6px; background:#E6F4EC; padding:4px 8px; border-radius:8px"><span style="display:inline-flex; align-items:flex-end; gap:2px; height:10px"><span style="width:3px; height:5px; background:{{ p.b1 }}"></span><span style="width:3px; height:7px; background:{{ p.b2 }}"></span><span style="width:3px; height:10px; background:{{ p.b3 }}"></span></span><span style="font-size:12px; font-weight:600">{{ p.tier }}</span></span>
+          <span style="font-size:14px; font-weight:600; color:#0B7A4B; font-variant-numeric:tabular-nums">+{{ p.earned }} USDC earned</span>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:32px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Progress, live rate, stepper</h2><p style="margin:0; font-size:15px; color:#5A655E">Progress bar for Goal pots. Live-rate dot beside any APY. Stepper on top of the new pot flow.</p></div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr)); gap:32px; align-items:start">
+    <div style="display:grid; gap:16px">
+      <div style="display:grid; gap:6px"><div style="height:6px; border-radius:3px; background:#DCE2DD"><div style="height:6px; width:0; background:#0B7A4B"></div></div><span style="font-size:12px; color:#5A655E">0% · Not started</span></div>
+      <div style="display:grid; gap:6px"><div style="height:6px; border-radius:3px; background:#DCE2DD"><div style="height:6px; width:70%; border-radius:3px; background:#0B7A4B"></div></div><span style="font-size:12px; color:#5A655E">70% · 840.00 of 1,200.00 USDC</span></div>
+      <div style="display:grid; gap:6px"><div style="height:6px; border-radius:3px; background:#0B7A4B"></div><span style="font-size:12px; color:#0B7A4B; font-weight:600">✓ Goal reached</span></div>
+    </div>
+    <div style="display:grid; gap:14px">
+      <span style="display:inline-flex; align-items:center; gap:8px; font-size:14px"><span style="width:8px; height:8px; border-radius:50%; background:#0B7A4B; box-shadow:0 0 0 4px #E6F4EC"></span><b>4.48% APY today</b><span style="color:#5A655E">· changes daily</span></span>
+      <span style="display:inline-flex; align-items:center; gap:8px; font-size:14px; color:#5A655E"><span style="width:8px; height:8px; border-radius:50%; background:#8A948D"></span>Rate unavailable · last 4.48%</span>
+    </div>
+    <div style="display:grid; gap:12px">
+      <div style="display:flex; justify-content:space-between; font-size:13px"><b>Step 3 of 4</b><span style="color:#5A655E">Pick a tier</span></div>
+      <div style="display:flex; gap:6px"><span style="flex:1; height:4px; border-radius:2px; background:#0A0A0A"></span><span style="flex:1; height:4px; border-radius:2px; background:#0A0A0A"></span><span style="flex:1; height:4px; border-radius:2px; background:#0B7A4B"></span><span style="flex:1; height:4px; border-radius:2px; background:#DCE2DD"></span></div>
+      <div style="display:flex; gap:8px; justify-content:center"><span style="width:8px; height:8px; border-radius:50%; background:#0A0A0A"></span><span style="width:8px; height:8px; border-radius:50%; background:#0A0A0A"></span><span style="width:24px; height:8px; border-radius:4px; background:#0B7A4B"></span><span style="width:8px; height:8px; border-radius:50%; background:#DCE2DD"></span></div>
+    </div>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:32px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Review list</h2><p style="margin:0; font-size:15px; color:#5A655E">Before every signature. Label left in grey, value right in black, total row in bold above a 1 px black rule.</p></div>
+  <div style="max-width:480px; border:1px solid #DCE2DD; border-radius:16px; padding:8px 20px">
+    <sc-for list="{{ review }}" as="r" hint-placeholder-count="6">
+      <div style="display:flex; justify-content:space-between; gap:16px; padding:14px 0; border-bottom:1px solid #DCE2DD; font-size:15px"><span style="color:#5A655E">{{ r.k }}</span><span style="font-weight:600; font-variant-numeric:tabular-nums; text-align:right">{{ r.v }}</span></div>
+    </sc-for>
+    <div style="display:flex; justify-content:space-between; gap:16px; padding:16px 0 12px; border-top:1px solid #0A0A0A; margin-top:-1px; font-size:16px"><b>In 1 year (est.)</b><b style="font-variant-numeric:tabular-nums">522.40 USDC</b></div>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:24px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Banners</h2><p style="margin:0; font-size:15px; color:#5A655E">Inline at the top of the affected content. Always a title in words; colour supports, never replaces.</p></div>
+  <div style="display:grid; gap:12px; max-width:640px">
+    <div style="background:#FCEBE9; border-radius:12px; padding:14px 16px; display:flex; gap:12px"><span style="width:20px; height:20px; border-radius:50%; background:#B3261E; color:#FFFFFF; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0">!</span><div style="display:grid; gap:2px; color:#B3261E; font-size:14px; line-height:20px"><b>Saving failed</b><span>Cancelled. Nothing was moved.</span></div></div>
+    <div style="background:#FFF4DC; border-radius:12px; padding:14px 16px; display:flex; gap:12px"><span style="width:20px; height:20px; border-radius:50%; background:#8A5A00; color:#FFFFFF; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0">!</span><div style="display:grid; gap:2px; color:#8A5A00; font-size:14px; line-height:20px"><b>Vault low on cash</b><span>This vault is low on available cash. Withdrawals may have to wait.</span></div></div>
+    <div style="background:#F5F7F5; border-radius:12px; padding:14px 16px; display:flex; gap:12px"><span style="width:20px; height:20px; border-radius:50%; border:1.5px solid #5A655E; color:#5A655E; font-size:12px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0">i</span><div style="display:grid; gap:2px; font-size:14px; line-height:20px"><b>Live rates unavailable</b><span style="color:#5A655E">Saving and withdrawing still work.</span></div></div>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:24px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Top bar</h2><p style="margin:0; font-size:15px; color:#5A655E">On every screen. Connect wallet is green only when nothing else on the screen is the main action; otherwise black outline.</p></div>
+  <div style="display:grid; gap:12px">
+    <div style="border:1px solid #DCE2DD; border-radius:16px; height:72px; padding:0 24px; display:flex; align-items:center; justify-content:space-between; gap:16px">
+      <div style="display:flex; align-items:center; gap:32px"><b style="font-size:22px">Pamọ́</b><div style="display:flex; gap:24px; font-size:14px"><span style="font-weight:600">Dashboard</span><span style="color:#5A655E">Portfolios</span><span style="color:#5A655E">Calculator</span></div></div>
+      <span style="height:40px; padding:0 20px; border-radius:999px; border:1.5px solid #0A0A0A; font-size:14px; font-weight:600; display:flex; align-items:center">Connect wallet</span>
+    </div>
+    <div style="border:1px solid #DCE2DD; border-radius:16px; height:72px; padding:0 24px; display:flex; align-items:center; justify-content:space-between; gap:16px">
+      <div style="display:flex; align-items:center; gap:32px"><b style="font-size:22px">Pamọ́</b><div style="display:flex; gap:24px; font-size:14px"><span style="font-weight:600; border-bottom:2px solid #0A0A0A; padding-bottom:4px">Dashboard</span><span style="color:#5A655E">Portfolios</span><span style="color:#5A655E">Calculator</span></div></div>
+      <span style="display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600; border:1px solid #DCE2DD; padding:8px 14px; border-radius:999px"><span style="width:8px; height:8px; border-radius:50%; background:#0B7A4B"></span>0x71C4…9A3f</span>
+    </div>
+    <div style="width:390px; max-width:100%; border:1px solid #DCE2DD; border-radius:16px; height:64px; padding:0 16px; display:flex; align-items:center; justify-content:space-between"><b style="font-size:20px">Pamọ́</b><span style="display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; border:1px solid #DCE2DD; padding:6px 10px; border-radius:999px"><span style="width:6px; height:6px; border-radius:50%; background:#0B7A4B"></span>0x71C4…9A3f</span></div>
+  </div>
+</section>
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:24px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Sheet and modal</h2><p style="margin:0; font-size:15px; color:#5A655E">Bottom sheet on phone, centred modal on desktop. The only place a shadow is allowed. Black scrim at 40%.</p></div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:16px">
+    <div style="height:420px; background:rgba(10,10,10,0.4); border-radius:16px; display:flex; align-items:flex-end; justify-content:center; overflow:hidden">
+      <div style="width:100%; max-width:390px; background:#FFFFFF; border-radius:24px 24px 0 0; padding:12px 20px 24px; display:grid; gap:16px; box-shadow:0 8px 32px rgba(10,10,10,0.10)">
+        <span style="width:40px; height:4px; border-radius:2px; background:#DCE2DD; justify-self:center"></span>
+        <b style="font-size:20px">Withdraw from Emergency fund</b>
+        <span style="font-size:14px; color:#5A655E">Available now: 2,310.75 USDC</span>
+        <div style="height:48px; border-radius:999px; background:#0B7A4B; color:#FFFFFF; font-weight:600; display:flex; align-items:center; justify-content:center">Withdraw</div>
+        <span style="text-align:center; font-size:15px; font-weight:600">Cancel</span>
+      </div>
+    </div>
+    <div style="height:420px; background:rgba(10,10,10,0.4); border-radius:16px; display:flex; align-items:center; justify-content:center; padding:24px">
+      <div style="width:100%; max-width:400px; background:#FFFFFF; border-radius:24px; padding:24px; display:grid; gap:16px; box-shadow:0 8px 32px rgba(10,10,10,0.10)">
+        <b style="font-size:20px">Allow Pamo to use your USDC</b>
+        <span style="font-size:14px; line-height:20px; color:#5A655E">Your wallet will ask you to confirm. This lets Pamo move 500.00 USDC into Rent. Nothing else.</span>
+        <div style="display:flex; gap:12px"><span style="flex:1; height:48px; border-radius:999px; border:1.5px solid #0A0A0A; font-weight:600; display:flex; align-items:center; justify-content:center">Cancel</span><span style="flex:1; height:48px; border-radius:999px; background:#0B7A4B; color:#FFFFFF; font-weight:600; display:flex; align-items:center; justify-content:center">Allow USDC</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:24px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Activity row</h2><p style="margin:0; font-size:15px; color:#5A655E">What happened, the pot, the amount, the date. Interest is green; failed rows say “Failed” in words.</p></div>
+  <div style="max-width:640px">
+    <sc-for list="{{ activity }}" as="a" hint-placeholder-count="4">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px 0; border-bottom:1px solid #DCE2DD">
+        <div style="display:flex; align-items:center; gap:12px"><span style="width:36px; height:36px; border-radius:50%; border:1px solid #DCE2DD"></span><div style="display:grid; gap:2px"><b style="font-size:15px; color:{{ a.c }}">{{ a.what }}</b><span style="font-size:13px; color:#5A655E">{{ a.pot }}</span></div></div>
+        <div style="display:grid; gap:2px; text-align:right"><b style="font-size:15px; color:{{ a.c }}; font-variant-numeric:tabular-nums">{{ a.amt }}</b><span style="font-size:13px; color:#5A655E">{{ a.date }}</span></div>
+      </div>
+    </sc-for>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:24px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Slider and chart</h2><p style="margin:0; font-size:15px; color:#5A655E">Calculator only. One green line on grey-line grid, no fill, no gradient. Always captioned as an estimate.</p></div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:32px; align-items:start">
+    <div style="display:grid; gap:16px">
+      <div style="display:flex; justify-content:space-between; font-size:14px"><b>Months</b><b style="font-variant-numeric:tabular-nums">12</b></div>
+      <div style="position:relative; height:24px; display:flex; align-items:center"><div style="height:4px; width:100%; border-radius:2px; background:#DCE2DD"></div><div style="position:absolute; left:0; height:4px; width:33%; border-radius:2px; background:#0B7A4B"></div><div style="position:absolute; left:calc(33% - 12px); width:24px; height:24px; border-radius:50%; background:#FFFFFF; border:2px solid #0B7A4B"></div></div>
+      <div style="display:flex; justify-content:space-between; font-size:12px; color:#5A655E"><span>1</span><span>36</span></div>
+    </div>
+    <div style="display:grid; gap:8px">
+      <svg viewBox="0 0 400 160" style="width:100%; height:auto">
+        <line x1="0" y1="40" x2="400" y2="40" stroke="#DCE2DD"></line><line x1="0" y1="80" x2="400" y2="80" stroke="#DCE2DD"></line><line x1="0" y1="120" x2="400" y2="120" stroke="#DCE2DD"></line><line x1="0" y1="159" x2="400" y2="159" stroke="#0A0A0A"></line>
+        <path d="M0 140 C 120 128, 260 96, 400 36" fill="none" stroke="#0B7A4B" stroke-width="2.5"></path>
+        <circle cx="400" cy="36" r="4" fill="#0B7A4B"></circle>
+      </svg>
+      <span style="font-size:12px; color:#5A655E">Estimate at today’s rate. Not a promise.</span>
+    </div>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:24px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Empty, loading, footer</h2><p style="margin:0; font-size:15px; color:#5A655E">Empty state invites the first saving. Skeletons match the shape of what loads. Footer is the one black moment.</p></div>
+  <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); gap:16px">
+    <div style="border:1px dashed #DCE2DD; border-radius:16px; padding:40px 24px; display:grid; gap:16px; justify-items:center; text-align:center">
+      <b style="font-size:18px">Nothing saved yet.</b>
+      <span style="font-size:14px; color:#5A655E">Start with any amount.</span>
+      <span style="height:48px; padding:0 24px; border-radius:999px; background:#0B7A4B; color:#FFFFFF; font-weight:600; display:flex; align-items:center">New Anytime Vault</span>
+    </div>
+    <div style="border:1px solid #DCE2DD; border-radius:16px; padding:20px; display:grid; gap:14px; align-content:start; animation:pshim 1.6s ease-in-out infinite">
+      <div style="height:18px; width:40%; border-radius:6px; background:#F5F7F5"></div>
+      <div style="height:32px; width:70%; border-radius:6px; background:#F5F7F5"></div>
+      <div style="height:6px; width:100%; border-radius:3px; background:#F5F7F5"></div>
+      <div style="height:14px; width:55%; border-radius:6px; background:#F5F7F5"></div>
+    </div>
+  </div>
+  <div style="background:#0A0A0A; color:#FFFFFF; border-radius:16px; padding:32px; display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap">
+    <div style="display:grid; gap:4px"><b style="font-size:28px">Pamọ́</b><span style="font-size:14px; color:#A3ADA6">Keep it safe.</span></div>
+    <span style="display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:#3DDC84"><span style="width:8px; height:8px; border-radius:50%; background:#3DDC84"></span>Live on Arc mainnet</span>
+  </div>
+</section>
+
+<section style="border-top:1px solid #DCE2DD; padding:56px 0; display:grid; gap:16px">
+  <div style="display:grid; gap:6px"><h2 style="margin:0; font-size:32px; line-height:40px">Tokens</h2><p style="margin:0; font-size:15px; color:#5A655E">Tailwind v4 @theme for the web app’s global CSS. No screen writes a hex value directly.</p></div>
+  <pre style="margin:0; background:#F5F7F5; border-radius:16px; padding:24px; font-family:ui-monospace,Menlo,monospace; font-size:13px; line-height:20px; overflow-x:auto; white-space:pre">@theme {
+  --font-sans: "Be Vietnam Pro", system-ui, sans-serif;
+
+  --color-white: #FFFFFF;           --color-black: #0A0A0A;
+  --color-green: #0B7A4B;           --color-green-pressed: #096640;
+  --color-green-bright: #3DDC84;    --color-mint: #E6F4EC;
+  --color-grey-text: #5A655E;       --color-grey-text-dark: #A3ADA6;
+  --color-grey-muted: #8A948D;      --color-grey-line: #DCE2DD;
+  --color-grey-surface: #F5F7F5;
+  --color-error: #B3261E;           --color-error-fill: #FCEBE9;
+  --color-caution: #8A5A00;         --color-caution-fill: #FFF4DC;
+
+  --spacing: 4px;   /* p-4 = 16px */
+
+  --radius-sm: 8px;  --radius-card: 16px;  --radius-sheet: 24px;  /* buttons: rounded-full */
+
+  --shadow-sheet: 0 8px 32px rgb(10 10 10 / 0.10);
+
+  --text-caption: 12px;  --text-caption--line-height: 16px;
+  --text-label: 14px;    --text-label--line-height: 20px;
+  --text-body: 16px;     --text-body--line-height: 24px;
+  --text-h3: 20px;       --text-h3--line-height: 28px;
+  --text-h2: 24px;       --text-h2--line-height: 32px;
+  --text-h1: 32px;       --text-h1--line-height: 40px;
+  --text-display: 40px;  --text-display--line-height: 48px;
+  --text-balance: 48px;  --text-balance--line-height: 56px;
+
+  --breakpoint-desktop: 1440px;  /* phone-first, base = 390 */
+}</pre>
+</section></div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  spin(c) {
+    return React.createElement('span', { style: { width: 20, height: 20, borderRadius: '50%', border: `2px solid ${c}`, borderTopColor: 'transparent', display: 'inline-block', animation: 'pspin .8s linear infinite' } });
+  }
+  renderVals() {
+    const on = '#0B7A4B', off = '#DCE2DD';
+    const bars = n => ({ b1: on, b2: n > 1 ? on : off, b3: n > 2 ? on : off });
+    return {
+      tiers: [['Calm',1],['Steady',2],['Bold',3]].map(([name,n]) => ({ name, ...bars(n) })),
+      tierCards: [
+        { name: 'Calm', n: 1, apy: '3.12%', note: 'The most established USDC lending vault. Lowest rate, smallest swings.', sel: false },
+        { name: 'Steady', n: 2, apy: '4.48%', note: 'A balanced USDC lending vault. A middle rate with moderate risk.', sel: true },
+        { name: 'Bold', n: 3, apy: '6.05%', note: 'A newer USDC lending vault. Higher rate, more chance of delays or loss.', sel: false },
+      ].map(t => ({ ...t, ...bars(t.n), border: t.sel ? '2px solid #0A0A0A' : '1px solid #DCE2DD', radio: t.sel ? '0' : '1.5px solid #DCE2DD', radioBg: t.sel ? '#0A0A0A' : '#FFFFFF', check: t.sel ? '✓' : '', state: t.sel ? 'Selected' : 'Default' })),
+      pots: [
+        { name: 'Rent', kind: 'Goal', tier: 'Steady', n: 2, value: '840.00', of: 'of 1,200.00 USDC', goal: true, pct: '70%', pctLabel: '70% of goal', unlock: 'Mar 1, 2027', earned: '12.48' },
+        { name: 'Emergency fund', kind: 'Anytime', tier: 'Calm', n: 1, value: '2,310.75', of: 'Withdraw anytime', goal: false, earned: '31.02' },
+        { name: 'New laptop', kind: 'Goal', tier: 'Bold', n: 3, value: '150.00', of: 'of 900.00 USDC', goal: true, pct: '17%', pctLabel: '17% of goal', unlock: 'Dec 20, 2026', earned: '0.94' },
+      ].map(p => ({ ...p, ...bars(p.n) })),
+      review: [['You save','500.00 USDC'],['Into','Rent · Steady'],['APY today','4.48%, changes daily'],['Vault fees','0.00 USDC'],['You receive','498.71 vault shares'],['Network fee','~0.01 USDC']].map(([k,v]) => ({ k, v })),
+      activity: [
+        { what: 'Saved', pot: 'Rent', amt: '+500.00 USDC', date: 'Oct 6, 2026', c: '#0A0A0A' },
+        { what: 'Interest', pot: 'Emergency fund', amt: '+0.21 USDC', date: 'Oct 6, 2026', c: '#0B7A4B' },
+        { what: 'Withdrew', pot: 'Emergency fund', amt: '−120.50 USDC', date: 'Oct 2, 2026', c: '#0A0A0A' },
+        { what: 'Failed', pot: 'New laptop', amt: '50.00 USDC', date: 'Sep 30, 2026', c: '#B3261E' },
+      ],
+      spinW: this.spin('#FFFFFF'), spinB: this.spin('#0A0A0A'),
+      btnStates: ['Default', 'Hover', 'Pressed', 'Disabled', 'Loading'],
+      space: [[1,4],[2,8],[3,12],[4,16],[5,20],[6,24],[8,32],[10,40],[12,48],[16,64]].map(([n,v]) => ({ name: 'space-' + n, v, px: v + 'px' })),
+    };
+  }
+}
+</script>
+</body>
+</html>
