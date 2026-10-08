@@ -10,13 +10,16 @@ The name comes from the Yoruba *fi pamọ́*, "keep it safe".
 
 **Early build.** The product spec and architecture are written; the contract, backend and web app are being built now for Arc Microgrants (deadline Oct 14, 2026).
 
+**Testnet first.** The whole build runs on Arc testnet (chain ID `5042002`) until every flow works. Pamo then deploys to Arc mainnet (chain ID `5042`) for the release.
+
 | Piece | State |
 |---|---|
 | Product spec and architecture | Done |
 | `PamoSavings` contract | Not started |
 | Backend (Express + indexer) | Not started |
 | Web app | Not started |
-| Arc mainnet deployment | Not deployed yet |
+| Arc testnet deployment | Not deployed yet |
+| Arc mainnet deployment | After the testnet build works |
 
 The live URL, contract address and explorer link will be added here once they exist.
 
@@ -70,7 +73,7 @@ Pamo makes it simple: save any amount, set goals, and earn live lending yield on
 | Web | Next.js (App Router), TypeScript, Tailwind CSS, wagmi, viem |
 | Backend | Node.js, Express, TypeScript, Circle Earn Kit |
 | Database | Supabase (Postgres) |
-| Network | Arc mainnet, chain ID `5042`, USDC with 6 decimals |
+| Network | Arc testnet (chain ID `5042002`) during the build, Arc mainnet (chain ID `5042`) for the release. USDC with 6 decimals |
 
 ## Planned repo layout
 

@@ -6,6 +6,7 @@ This guide takes v1 from an empty folder to a submitted entry, in order. It is a
 
 - **Deadline:** Arc Microgrants submissions close **Tue Oct 14, 23:59 ET**. Aim to submit by **Oct 14, 12:00 ET**.
 - **Hard requirements:** a live **Arc mainnet** deployment and a **public repo**. Testnet-only entries, mockups and slide decks are rejected.
+- **Build order:** **testnet first, then mainnet.** Everything is built and proven on Arc testnet with faucet USDC. The mainnet deploy comes once the testnet build works (§8, Phase 6). Until then there is nothing to submit.
 - **Companion docs:** [Specification.md](Specification.md) (what we build) · [Architecture.md](Architecture.md) (how it fits together: stack, data flow, app flow, risks) · [Brand_Design.md](Brand_Design.md) (colours, logo, type). Section numbers like "Arch §5.3" point into Architecture.md.
 
 ---
@@ -377,36 +378,36 @@ All icons come from **Iconsax** (`iconsax-react`), so the whole app shares one d
 
 ## 8. Ordered task list
 
-Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. Tasks are ordered so a real end-to-end flow on mainnet exists by **Oct 8**. Each phase ends at a checkpoint you could fall back to. Risk numbers (#1 to #10) refer to **Arch §11**.
+Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. Tasks are ordered so a real end-to-end flow exists early, **on testnet first**. The move to mainnet is in Phase 6, once every flow works on testnet. Each phase ends at a checkpoint you could fall back to. Risk numbers (#1 to #10) refer to **Arch §11**.
 
 ### Phase 0: Setup and de-risk (Oct 5, today)
 
-- [ ] **#1** Get real USDC onto an Arc mainnet wallet (about 20–50 USDC); send 0.01 USDC to yourself
+- [ ] Get testnet USDC from the faucet (`https://faucet.circle.com`) onto the deployer wallet; send 0.01 USDC to yourself
 - [ ] **#3** Install Arc Foundry (`github.com/circlefin/arc-foundry/releases`) → `arc-forge --version`
-- [ ] **#2** With `arc-cast`: deposit 1 USDC into the Calm vault from your wallet, then withdraw it
+- [ ] **#2** With `arc-cast` on testnet: deposit 1 USDC into a mock vault from your wallet, then withdraw it. Repeat against a real vault in a mainnet fork test (free)
 - [ ] Create the repo layout (§3), `git init`, public GitHub repo
 - [ ] Deployer wallet (`arc-cast wallet new`), key in `contracts/.env`, never committed
-- [ ] Re-run `exploreVaults({ chain: "Arc" })`; check liquidity and pick the Calm / Steady / Bold vaults (**#8**)
+- [ ] Find the testnet mock vaults and map the three tiers onto them (Arch §9)
+- [ ] Re-run `exploreVaults({ chain: "Arc" })`; shortlist the mainnet Calm / Steady / Bold vaults (**#8**). Final pick is re-checked before the mainnet deploy
 - [ ] Create the Supabase project; create the Railway or Render account
 
 ### Phase 1: Contract (Oct 6)
 
 - [ ] Write `PamoSavings.sol` (§4, Arch §4.2)
-- [ ] Fork tests against mainnet Morpho vaults (`arc-forge test --network arc`), all of §4's list
-- [ ] Deploy script with the three tier vaults
-- [ ] **#5** Find the mainnet verifier URL and verify a dummy contract
+- [ ] Fork tests against mainnet Morpho vaults (`arc-forge test --network arc`), all of §4's list. This is a local fork, so no real money
+- [ ] Deploy script with the three tier vaults, taking the network and vault addresses from env
+- [ ] Verify a dummy contract on the testnet explorer
 
-### Phase 2: Go live, ugly (Oct 7)
+### Phase 2: Go live on testnet, ugly (Oct 7)
 
-- [ ] Deploy to testnet, smoke-test with `arc-cast`
-- [ ] **Deploy to Arc mainnet** and verify the source
+- [ ] **Deploy to Arc testnet** and verify the source
 - [ ] With `arc-cast`: open a pot, deposit 1 USDC, withdraw it
 - [ ] Express skeleton: `/api/health` + `/api/vaults` with the Earn Kit and 60 s cache
 - [ ] **#4** Test Earn Kit quotes from Express; if they need the user's wallet, plan them client-side
 - [ ] **#9** Deploy Express to Railway/Render; time a cold request
 - [ ] **#6** Measure Arc RPC `getLogs` range limits
 
-> ✅ **Checkpoint 1: "Contract live on mainnet."** A deposit and a withdrawal work on the explorer, and `/api/vaults` returns live rates. Already a valid submission if everything else fails.
+> ✅ **Checkpoint 1: "Contract live on testnet."** A deposit and a withdrawal work on the testnet explorer, and `/api/vaults` returns rates. Not a valid submission yet: that needs the mainnet deploy in Phase 6.
 
 ### Phase 3: Core flow in the browser (Oct 8)
 
@@ -418,7 +419,7 @@ Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. 
 - [ ] Withdraw part and withdraw all
 - [ ] Raw styling, **no animation yet**
 
-> ✅ **Checkpoint 2: "Core flow working."** Connect → save → see balance → withdraw, on mainnet, in the browser. **This is the fallback demo.**
+> ✅ **Checkpoint 2: "Core flow working."** Connect → save → see balance → withdraw, on testnet, in the browser. **Deployed to mainnet, this is the fallback demo.**
 
 ### Phase 4: Backend data + the rest of v1 (Oct 9–10)
 
@@ -453,6 +454,11 @@ Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. 
 - [ ] Landing page (§6 screen 1)
 - [ ] GSAP hero timeline + ScrollTrigger "how it works" and feature cards; anime.js logo tone marks (§7.3); GSAP loaded only on `/`
 - [ ] **#10** Test motion on a mid-range phone; trim or drop anime.js if janky
+- [ ] **Move to mainnet.** **#1** Get real USDC onto an Arc mainnet wallet (about 20–50 USDC); send 0.01 USDC to yourself
+- [ ] Re-check liquidity and confirm the three mainnet tier vaults (**#8**)
+- [ ] **#5** Find the mainnet verifier URL; **deploy `PamoSavings` to Arc mainnet** and verify the source
+- [ ] With `arc-cast` on mainnet: open a pot, deposit 1 USDC, withdraw it
+- [ ] Switch the env vars to mainnet (Arch §9): chain ID, RPC URL, contract address, Circle mainnet key
 - [ ] Deploy web to Vercel (env vars from Arch §9), pointing at mainnet and the hosted Express
 - [ ] Production Supabase + indexer running; `/api/health` shows the indexer caught up
 - [ ] Phone-width check of every screen

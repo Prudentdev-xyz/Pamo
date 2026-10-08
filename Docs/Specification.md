@@ -6,7 +6,7 @@
 |---|---|
 | **Product** | Pamo, a save-and-earn app on Arc |
 | **Version** | v1 (MVP for Arc Microgrants) |
-| **Network** | Arc mainnet (chain ID `5042`). Currently live on Arc; multichain support is on the roadmap. |
+| **Network** | Arc mainnet (chain ID `5042`) for the release. Built and tested on Arc testnet (chain ID `5042002`) first. Multichain support is on the roadmap. |
 | **Platform** | Web app (works in phone browsers). Mobile app is on the roadmap. |
 | **Deadline** | Oct 14, 23:59 ET |
 | **Companion doc** | [Build_Guide.md](Build_Guide.md): how and in what order it gets built |
@@ -277,6 +277,8 @@ Also roadmap. These make Pamo feel like a normal app for people who have never u
 ---
 
 ## 8. Success criteria (demo day)
+
+The build runs on Arc testnet first, and each flow below is checked there before the mainnet deploy. The final check is on mainnet.
 
 "It works" means all of these are true:
 

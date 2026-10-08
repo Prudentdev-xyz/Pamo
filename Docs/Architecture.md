@@ -6,6 +6,7 @@ How Pamo is put together: the stack, the system parts, how data moves, how the a
 |---|---|
 | **Companion docs** | [Specification.md](Specification.md) (what we build) · [Build_Guide.md](Build_Guide.md) (in what order) |
 | **Network** | Arc mainnet, chain ID `5042`, RPC `https://rpc.mainnet.arc.io` |
+| **Build network** | Arc testnet first, chain ID `5042002`, RPC `https://rpc.testnet.arc.io`. Mainnet comes once the testnet build works (§9) |
 | **Money** | USDC at `0x3600000000000000000000000000000000000000` (ERC-20 interface, 6 decimals) |
 
 **The one rule behind everything:** the blockchain is the source of truth. Balances, pots and lock rules live in the contract. The backend and database only cache, index and enrich. If the backend goes down, users can still save and withdraw.
@@ -389,6 +390,8 @@ export const arc = defineChain({
 // Balances shown to users always come from the ERC-20 USDC contract (6 dp), never the native balance.
 ```
 
+An `arcTestnet` chain (id `5042002`, RPC `https://rpc.testnet.arc.io`, explorer `https://explorer.testnet.arc.io`) is defined beside it. The app uses the chain named in `NEXT_PUBLIC_CHAIN_ID` (§9): testnet during the build, mainnet for the release.
+
 ---
 
 ## 7. Data flow
@@ -608,7 +611,8 @@ appLayout():
 | Variable | Where | Purpose |
 |---|---|---|
 | `PRIVATE_KEY` | `contracts/.env` | Deployer key. Never committed. Only used for deploy and admin calls |
-| `ARC_RPC_URL` | contracts, server | `https://rpc.mainnet.arc.io` (testnet `https://rpc.testnet.arc.io`) |
+| `ARC_RPC_URL` | contracts, server | `https://rpc.testnet.arc.io` during the build, `https://rpc.mainnet.arc.io` for the release |
+| `CHAIN_ID`, `NEXT_PUBLIC_CHAIN_ID` | server, web | `5042002` during the build, `5042` for the release |
 | `PAMO_SAVINGS_ADDRESS` | server, web | Deployed contract |
 | `CIRCLE_API_KEY` | server only | Earn Kit rate limit. Mainnet and testnet keys differ |
 | `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` | server only | Database access |
@@ -619,8 +623,14 @@ appLayout():
 | Environment | Chain | Vaults | Use |
 |---|---|---|---|
 | Local | `arc-anvil` forking Arc mainnet | Real mainnet vaults (forked) | Contract tests |
-| Testnet | Arc Testnet `5042002` | Two mock vaults only | Smoke-test deploy scripts and the UI wiring |
-| Production | Arc mainnet `5042` | Three real tier vaults | The submission |
+| Testnet | Arc Testnet `5042002` | Two mock vaults only | **The whole build.** Contract, backend and web app all run here first |
+| Production | Arc mainnet `5042` | Three real tier vaults | The release and the submission, deployed once the testnet build works |
+
+**Testnet first, then mainnet.** Everything is built and proven on testnet with faucet USDC. Moving to mainnet is a fresh deploy of `PamoSavings` plus a config change: the chain ID, RPC URL, contract address, tier vaults and Circle API key all come from the variables above, so no code changes.
+
+- Testnet has only two mock vaults, so two tiers share a vault there, or we deploy our own mock ERC-4626 for the third.
+- Mock vaults don't behave exactly like the real ones, so the fork tests still run against real mainnet vaults on a local fork. That costs nothing.
+- Testnet rates and liquidity are not real. Honest live numbers only appear on mainnet.
 
 ---
 
@@ -651,7 +661,7 @@ Ordered by how badly they could block the build. Each has a quick test to run **
 
 | # | Risk | Why it matters | De-risk test (do it early) | By |
 |---|---|---|---|---|
-| 1 | **Mainnet USDC for gas and demo** | Nothing ships without it | Get 20–50 USDC onto an Arc mainnet wallet; send 0.01 USDC to yourself | Oct 5 |
+| 1 | **Mainnet USDC for gas and demo** | Nothing ships without it. The build itself uses testnet USDC from the faucet | Get 20–50 USDC onto an Arc mainnet wallet; send 0.01 USDC to yourself | Before the mainnet deploy |
 | 2 | **Morpho Vault V2 from a contract** | The whole product depends on it | With `arc-cast`, deposit 1 USDC into the Calm vault from your wallet, then `withdraw` it. Then the same in a fork test from a contract | Oct 5 |
 | 3 | **Arc Foundry install + fork tests** | Standard Foundry can't reproduce Arc behaviour | Install, run `arc-forge test --network arc` on a fork of mainnet | Oct 5 |
 | 4 | **Earn Kit quotes from the server** | Quotes take `from: { adapter, chain }`; may need the user's wallet | Call `getDepositQuote` in Express with a read-only viem adapter for an arbitrary address. If it fails, move quotes client-side (no API key in the browser) | Oct 6 |
