@@ -1,0 +1,32 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.30"
+optimizer = true
+optimizer_runs = 200
+remappings = [
+    "forge-std/=lib/forge-std/src/",
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
+]
+
+[fuzz]
+runs = 256
+
+# Pre-deploy run: FOUNDRY_PROFILE=deep arc-forge test --network arc
+[profile.deep.fuzz]
+runs = 10000
+
+[rpc_endpoints]
+arc_testnet = "https://rpc.testnet.arc.io"
+arc_mainnet = "https://rpc.mainnet.arc.io"
+
+# Fork-based, so kept small by default
+[invariant]
+runs = 8
+depth = 40
+fail_on_revert = true
+
+[profile.deep.invariant]
+runs = 64
+depth = 100
