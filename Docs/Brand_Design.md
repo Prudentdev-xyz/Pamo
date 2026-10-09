@@ -3,7 +3,8 @@
 The colours, logo and type rules for Pamo, and how to use them. Every screen, the logo and any pitch material build from the values here.
 
 - **Companion docs:** [Build_Guide.md](Build_Guide.md) §6 (screens and copy rules) · [Specification.md](Specification.md) (what we build) · [Brand_Kit_Prompt.md](Brand_Kit_Prompt.md) (prompts for generating the brand kit and design system)
-- **Status:** colours confirmed Oct 7, 2026. Typeface and logo artwork are still open (§8).
+- **Design files:** `Brand Kit & Design/` in the repo root: the brand kit, the design system (every component and its states), logo exports and mockups.
+- **Status:** colours confirmed Oct 7, 2026. The typeface, spacing, radii and type scale come from the design system (§7, §8). Logo files exist as PNG only (§6).
 
 ---
 
@@ -115,13 +116,15 @@ The tier chip is the name and the mark on a mint fill. The name is always shown,
 - **Never** set the wordmark in green, place it on a photo, or put it in a coloured box.
 - **Clear space:** keep at least the height of the letter "a" free on every side.
 - **Motion:** on the landing page, "Pamo" fades in and the tone marks settle into place (Build Guide §7.3).
+- **Files:** `Brand Kit & Design/Pamo Logos/export/brand-assets/` has the wordmark, the compact mark and a cover image as 1080 px PNGs. There is no SVG yet; the web app needs an SVG wordmark with the text converted to outlines, so the ọ́ cannot break if a font fails to load.
+- The exports include green-on-white and black-on-green versions. The rules above rule those out, so use only black on white and white on black.
 
 ---
 
 ## 7. Type
 
-- One clean sans for everything. Inter is the placeholder until the typeface is chosen (§8).
-- The typeface must draw **ọ́** correctly (the dot below and the acute accent together) for the wordmark.
+- **Be Vietnam Pro** for everything, loaded from Google Fonts at 400, 600 and 700. It is the typeface the design system is drawn in.
+- It draws **ọ́** correctly (the dot below and the acute accent together), which the wordmark needs.
 - Tabular figures for every amount.
 - Weights: regular for body, semibold for buttons and labels, bold for headings and big balances.
 
@@ -151,10 +154,31 @@ Defined once in the web app's global CSS and used everywhere. No screen writes a
   --color-error-fill: #FCEBE9;
   --color-caution: #8A5A00;
   --color-caution-fill: #FFF4DC;
+
+  --font-sans: "Be Vietnam Pro", system-ui, sans-serif;
+
+  --spacing: 4px;   /* p-4 = 16px */
+
+  --radius-sm: 8px;      /* chips, inputs */
+  --radius-card: 16px;
+  --radius-sheet: 24px;  /* buttons are fully round: rounded-full */
+
+  --shadow-sheet: 0 8px 32px rgb(10 10 10 / 0.10);  /* sheets and modals only */
+
+  --text-caption: 12px;  --text-caption--line-height: 16px;
+  --text-label: 14px;    --text-label--line-height: 20px;
+  --text-body: 16px;     --text-body--line-height: 24px;
+  --text-h3: 20px;       --text-h3--line-height: 28px;
+  --text-h2: 24px;       --text-h2--line-height: 32px;
+  --text-h1: 32px;       --text-h1--line-height: 40px;
+  --text-display: 40px;  --text-display--line-height: 48px;
+  --text-balance: 48px;  --text-balance--line-height: 56px;
+
+  --breakpoint-desktop: 1440px;  /* phone first, base width 390 */
 }
 ```
 
-This gives classes like `bg-green`, `text-grey-text`, `border-grey-line` and `bg-mint`.
+This gives classes like `bg-green`, `text-grey-text`, `border-grey-line`, `bg-mint`, `rounded-card` and `text-balance`. The block matches the Tokens section of the design system file.
 
 ---
 
@@ -164,8 +188,9 @@ This gives classes like `bg-green`, `text-grey-text`, `border-grey-line` and `bg
 |---|---|---|
 | Brand colours | White, black, Pamo green `#0B7A4B` | ✅ Confirmed |
 | White as the first colour | White dominant, green as the accent | ✅ Confirmed |
-| Typeface | One sans that draws ọ́ well; Inter as placeholder | Open |
-| Logo artwork | Wordmark only, black on white | Spelling confirmed, artwork open |
+| Typeface | Be Vietnam Pro | Chosen in the design system |
+| Spacing, radii, type scale | 4 px spacing; radii 8 / 16 / 24; type from 12 to 48 px (§8) | From the design system |
+| Logo artwork | Wordmark only, black on white | PNG exports done; SVG with outlined text still needed |
 | Tier level mark | Three bars, 1 to 3 filled | Recommended, not confirmed |
 | Status colours | Error `#B3261E`, caution `#8A5A00` | Recommended, not confirmed |
 | Dark mode | Not in v1 | Recommended, not confirmed |

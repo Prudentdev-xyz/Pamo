@@ -161,7 +161,8 @@ Each feature lists what it does, its rules and its **acceptance criteria**: how 
 
 - Open with a name, target (USDC), unlock date, tier and first deposit.
 - Add money any time.
-- Withdraw only when **value ≥ target** OR **now ≥ unlock date**.
+- Withdraw only when **value ≥ target** OR **now ≥ unlock date**. Money put in also counts toward the target, and once a goal unlocks it stays unlocked.
+- The pot name is at most 64 characters and is public onchain.
 - No early break in v1.
 
 **Accept when:** withdrawing a locked goal is refused (in the UI and in the contract); a goal with a small target unlocks as soon as the target is reached.
@@ -299,6 +300,6 @@ The build runs on Arc testnet first, and each flow below is checked there before
 | Decision | Recommendation | Status |
 |---|---|---|
 | Tier → vault mapping | One vault per tier, honest live rate | Recommended, not confirmed |
-| The three vaults | Re-check before deploy (Oct 1 snapshot: Calm = Gauntlet USDC Prime, Steady = Keyrock Prime USDC, Bold = Bitwise Premium RWA USDC) | Open |
+| The three vaults | Re-check before the mainnet deploy. Oct 1 picks: Calm = Gauntlet USDC Prime, Steady = Keyrock Prime USDC, Bold = Bitwise Premium RWA USDC. On Oct 8 Gauntlet had no USDC available to withdraw; Steakhouse Prime USDC is the better Calm candidate (Build Guide §10) | Open |
 | Early goal break | Not in v1 | Open |
 | Logo tone marks | Pamọ́, plain black text on white, no background block | ✅ Confirmed |

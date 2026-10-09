@@ -8,17 +8,17 @@ The name comes from the Yoruba *fi pamọ́*, "keep it safe".
 
 ## Status
 
-**Early build.** The product spec and architecture are written; the contract, backend and web app are being built now for Arc Microgrants (deadline Oct 14, 2026).
+**Early build.** The contract is live on Arc testnet; the backend and web app are being built now for Arc Microgrants (deadline Oct 14, 2026).
 
 **Testnet first.** The whole build runs on Arc testnet (chain ID `5042002`) until every flow works. Pamo then deploys to Arc mainnet (chain ID `5042`) for the release.
 
 | Piece | State |
 |---|---|
 | Product spec and architecture | Done |
-| `PamoSavings` contract | Not started |
-| Backend (Express + indexer) | Not started |
+| `PamoSavings` contract | Written, 44 tests passing |
+| Backend (Express + indexer) | Skeleton: health and live vault rates |
 | Web app | Not started |
-| Arc testnet deployment | Not deployed yet |
+| Arc testnet deployment | [`0x9952E937378bb093DFA010e94FC81D56EC4cBF17`](https://explorer.testnet.arc.io/address/0x9952E937378bb093DFA010e94FC81D56EC4cBF17), verified |
 | Arc mainnet deployment | After the testnet build works |
 
 The live URL, contract address and explorer link will be added here once they exist.

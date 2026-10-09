@@ -7,7 +7,8 @@ This guide takes v1 from an empty folder to a submitted entry, in order. It is a
 - **Deadline:** Arc Microgrants submissions close **Tue Oct 14, 23:59 ET**. Aim to submit by **Oct 14, 12:00 ET**.
 - **Hard requirements:** a live **Arc mainnet** deployment and a **public repo**. Testnet-only entries, mockups and slide decks are rejected.
 - **Build order:** **testnet first, then mainnet.** Everything is built and proven on Arc testnet with faucet USDC. The mainnet deploy comes once the testnet build works (§8, Phase 6). Until then there is nothing to submit.
-- **Companion docs:** [Specification.md](Specification.md) (what we build) · [Architecture.md](Architecture.md) (how it fits together: stack, data flow, app flow, risks) · [Brand_Design.md](Brand_Design.md) (colours, logo, type). Section numbers like "Arch §5.3" point into Architecture.md.
+- **Companion docs:** [Specification.md](Specification.md) (what we build) · [Architecture.md](Architecture.md) (how it fits together: stack, data flow, app flow, risks) · [Brand_Design.md](Brand_Design.md) (colours, logo, type, tokens). Section numbers like "Arch §5.3" point into Architecture.md.
+- **Design files:** `Brand Kit & Design/` holds the brand kit, the design system (components and tokens), the logo exports and the mockups. The file to build from is `Pamo design system-handoff/pamo-brand-kit-and-design-system/project/Pamo Design System (Standalone).dc.html`.
 
 ---
 
@@ -64,6 +65,9 @@ The Earn Kit is Pamo's **window** onto the vaults. The contract is the **hands**
 | USDC (both networks) | `0x3600000000000000000000000000000000000000`, **6 decimals** via ERC-20 |
 | Multicall3 | `0xcA11bde05977b3631167028862bE2a173976CA11` |
 | Testnet faucet | `https://faucet.circle.com` |
+| **PamoSavings on testnet** | `0x9952E937378bb093DFA010e94FC81D56EC4cBF17`, verified, deployed at block `66067781` |
+| Testnet vault: EarnKit USDC Vault | `0xaabbef1d3971c710276ed41ec791bbe14cdb8e88`, shares have 18 decimals |
+| Testnet vault: MockMorphoVault | `0x8f2d33b5d4b9b5f02df635ae308f7b4c9da8d2dc`, shares have **6** decimals |
 | Gas | paid in USDC; set `maxFeePerGas` ≥ 20 Gwei or the transaction is silently dropped |
 
 ---
@@ -72,18 +76,22 @@ The Earn Kit is Pamo's **window** onto the vaults. The contract is the **hands**
 
 ```
 Pamo/
-├── contracts/                  Foundry project (arc-forge)
+├── contracts/                  Foundry project (arc-forge), set up
 │   ├── src/PamoSavings.sol
 │   ├── test/PamoSavings.t.sol  fork tests against Arc mainnet vaults
-│   └── script/Deploy.s.sol
+│   ├── test/ForkSmoke.t.sol    Arc and vault assumptions, already passing
+│   ├── script/Deploy.s.sol
+│   ├── foundry.toml            Solidity 0.8.30, both Arc RPCs, `deep` fuzz profile
+│   └── lib/                    forge-std and OpenZeppelin (git submodules)
 ├── server/                     Node.js + Express + TypeScript
-│   └── src/  index.ts · routes/ (vaults, quotes, activity) · earn.ts · indexer.ts · supabase.ts · chain.ts
+│   └── src/  index.ts · config.ts · routes/ (vaults, quotes, activity) · earn.ts · indexer.ts · supabase.ts · chain.ts
 ├── web/                        Next.js + TypeScript + Tailwind
 │   ├── app/                    /  /calculator  /portfolios  /app  /app/new  /app/pot/[id]
 │   ├── components/             PotCard, ReviewSheet, TierCard, Stepper, Calculator, Icon, …
 │   ├── lib/                    chain.ts · contract.ts · api.ts · format.ts · growth.ts
 │   └── motion/                 tokens.ts · variants.ts (Motion) · landing.ts (GSAP) · countUp.ts (anime.js)
 ├── supabase/schema.sql         tables from Arch §5.3
+├── Brand Kit & Design/         brand kit, design system handoff, logos, mockups
 ├── Docs/
 └── README.md
 ```
@@ -105,7 +113,7 @@ Pamo/
 
 ## 4. The contract: `PamoSavings.sol`
 
-Full pseudocode for every function is in **Arch §4.2**. Summary:
+Written and tested: `contracts/src/PamoSavings.sol`. Full pseudocode for every function is in **Arch §4.2**. Summary:
 
 ```solidity
 enum Kind { Anytime, Goal }
@@ -115,11 +123,12 @@ struct Pot {
     address owner;
     Kind    kind;
     Tier    tier;
+    bool    unlocked;   // Goal only: set once the goal first unlocks, never cleared
+    uint64  unlockAt;   // Goal only, unix seconds
     address vault;      // fixed when the pot opens
-    uint256 shares;     // Morpho vault shares held for this pot (18 dp)
+    uint256 shares;     // vault shares held for this pot (the vault's own decimals)
     uint256 principal;  // USDC in minus USDC out (6 dp), for "earned"
     uint256 target;     // Goal only, USDC (6 dp)
-    uint64  unlockAt;   // Goal only, unix seconds
 }
 
 IERC20 public constant USDC = IERC20(0x3600000000000000000000000000000000000000);
@@ -130,37 +139,44 @@ mapping(address => uint256[]) public potsOf;
 
 | Function | Who | What it does |
 |---|---|---|
-| `openPot(kind, tier, target, unlockAt, name)` | user | Creates a pot using `vaultFor[tier]`; emits `PotOpened` (the name lives in the event; the indexer stores it) |
+| `openPot(kind, tier, target, unlockAt, name, assets)` | user | Creates a pot using `vaultFor[tier]` and makes the first deposit in the same call, so a first save is two signatures (Allow, Save). Emits `PotOpened` (the name lives in the event, capped at 64 bytes; the indexer stores it) |
 | `deposit(potId, assets)` | pot owner | `transferFrom` USDC in → `forceApprove` vault → `vault.deposit(assets, this)` → add shares and principal |
-| `withdraw(potId, assets)` | pot owner | Anytime: always. Goal: only when unlocked. `vault.withdraw(assets, owner, this)` |
+| `withdraw(potId, assets)` | pot owner | Anytime: always. Goal: only when unlocked. Redeems the shares that cover `assets` (`previewWithdraw`, then `vault.redeem(shares, owner, this)`) |
 | `withdrawAll(potId)` | pot owner | Same rules; `vault.redeem(pot.shares, owner, this)` |
-| `potValue` · `isUnlocked` · `getPots` | view | Live value, lock state, all pots for one owner in one read |
+| `potValue` · `isUnlocked` · `getPot` · `getPots` | view | Live value, lock state, one pot, all pots for one owner in one read |
 | `setTierVault(tier, vault)` | admin | Requires `asset() == USDC`; affects **new** pots only |
 | `pause()` / `unpause()` | admin | Blocks `openPot` and `deposit` only, never withdrawals |
 
-**Events:** `PotOpened`, `Deposited`, `Withdrawn`, `TierVaultSet` (the indexer depends on these; don't rename them after deploy).
+**Events:** `PotOpened`, `Deposited`, `Withdrawn`, `TierVaultSet` (the indexer depends on these; don't rename them after deploy). The first three carry the pot id and the owner as indexed fields.
 
-**Arc rules the contract obeys:** Arch §4.3 (ERC-20 USDC only, 18-dp shares, ignore `max*`, liquidity reverts, blocklist reverts, repeatable timestamps, 20 Gwei floor).
+**Goal unlock rule:** a goal unlocks on its date, or when its value or the money put in reaches the target. Money put in counts because depositing exactly the target is worth one micro-USDC less after the vault's rounding. Once unlocked it stays unlocked, even if a partial withdrawal takes it back under the target.
+
+**Arc rules the contract obeys:** Arch §4.3 (ERC-20 USDC only, shares in the vault's own decimals, ignore `max*`, liquidity reverts, blocklist reverts, repeatable timestamps, 20 Gwei floor).
 
 ### Tests (fork Arc mainnet, real Morpho vaults)
 
+Run with `arc-forge test --network arc`. Plain Foundry cannot move USDC on an Arc fork, so these tests fail under it. `test/ForkSmoke.t.sol` already proves the basics: a contract can deposit 1 USDC into five real mainnet vaults and get 0.999999 USDC back.
+
 - Deposit, withdraw part, withdraw all: user ends with ≈ deposit (±1 micro-USDC rounding).
-- Goal pot: refused before unlock; allowed after the date **or** once the target is reached.
+- Goal pot: refused before unlock; allowed after the date **or** once the target is reached; stays unlocked after a partial withdrawal.
 - Only the owner can touch a pot.
 - `setTierVault` rejects a non-USDC vault; existing pots keep their old vault.
 - Pause blocks deposits but **not** withdrawals; admin has no path to user funds.
-- Withdrawal involving the seeded blocklisted address `0x7099…79C8` reverts cleanly.
-- Decimals: deposit `1_000000` (1 USDC); shares are 18 dp; value comes back ≈ `1_000000`.
+- A vault that cannot pay reverts the whole withdrawal and leaves the pot unchanged. (The address `0x7099…79C8` is not blocklisted on a mainnet fork, so the blocklist case is tested as a reverting vault.)
+- Decimals: deposit `1_000000` (1 USDC); value comes back ≈ `1_000000`. Never assume share decimals: mainnet vaults use 18, one testnet mock uses 6.
 - Events carry the fields the indexer needs (Arch §5.3).
 - **Fuzz tests** on deposit and withdraw amounts (all the share and pro-rata principal maths).
+- The full flow on the two testnet vaults, including the 6-decimal-share one (`test/PamoSavings.testnet.t.sol`).
 - **Invariant tests** (stateful contract, so ethskills `testing` requires them): for each vault, the sum of `pot.shares` equals PamoSavings' share balance in that vault; no pot's value can be withdrawn by anyone but its owner; `principal` never goes negative.
+
+**Status (Oct 8):** 44 tests pass under `arc-forge test --network arc`, including the 10,000-run fuzz pass and the invariants.
 
 ### Before deploying (ethskills `security` checklist)
 
-- [ ] Run **Slither** (`slither .`) and fix any reentrancy, unchecked-return or unprotected-function findings.
-- [ ] Fuzz runs at 10,000 (`arc-forge test --fuzz-runs 10000`).
-- [ ] Approvals are **exact amounts only**, in the contract (`forceApprove(vault, assets)`) and in the frontend (never `type(uint256).max`).
-- [ ] CEI order + `nonReentrant` on every function that calls the vault.
+- [x] Run **Slither** (`slither . --filter-paths "lib|test|script"`) and fix any reentrancy, unchecked-return or unprotected-function findings. Result: no high or medium findings. Three accepted notes: state is written after `vault.deposit` (the share count comes from its return value; every state-changing function is `nonReentrant`), `getPots` calls the vault in a loop (view only), and unlock dates compare `block.timestamp` (day-scale).
+- [x] Fuzz runs at 10,000 (`FOUNDRY_PROFILE=deep arc-forge test --network arc`).
+- [ ] Approvals are **exact amounts only**, in the contract (`forceApprove(vault, assets)`, done and tested) and in the frontend (never `type(uint256).max`).
+- [x] CEI order + `nonReentrant` on every function that calls the vault (withdrawals update state before calling the vault).
 - [ ] **Admin key:** `pause` and `setTierVault` sit with one key. ethskills flags a single key as a censorship risk. Pause only blocks new deposits (withdrawals always work), which limits it; still, move ownership to a multisig (e.g. Safe, if deployed on Arc) or add a timelock on `setTierVault` when possible, and say so in the README.
 - [ ] Source verified on the explorer right after deploy.
 
@@ -205,7 +221,8 @@ Endpoints, schema and indexer pseudocode: **Arch §5**.
 - **Tiers:** Calm, Steady and Bold are not separate colours. Each shows its name plus a level mark with 1, 2 or 3 bars filled in Pamo green.
 - **Status:** errors and cautions have their own colours, used only for that (Brand_Design.md §2).
 - **Tokens:** every colour is defined once as a Tailwind theme token (Brand_Design.md §8). No screen writes a hex value directly.
-- **Type:** one clean sans (e.g. Inter); tabular figures for every amount.
+- **Type:** **Be Vietnam Pro** for everything, the design system's typeface (regular, semibold, bold); tabular figures for every amount.
+- **Components:** the design system draws every component and its states, but not whole screens. The screens below are composed from those components.
 
 ### Copy rules
 
@@ -378,38 +395,39 @@ All icons come from **Iconsax** (`iconsax-react`), so the whole app shares one d
 
 ## 8. Ordered task list
 
-Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. Tasks are ordered so a real end-to-end flow exists early, **on testnet first**. The move to mainnet is in Phase 6, once every flow works on testnet. Each phase ends at a checkpoint you could fall back to. Risk numbers (#1 to #10) refer to **Arch §11**.
+Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are ordered so a real end-to-end flow exists early, **on testnet first**. The move to mainnet is in Phase 6, once every flow works on testnet. Each phase ends at a checkpoint you could fall back to. Risk numbers (#1 to #10) refer to **Arch §11**.
 
-### Phase 0: Setup and de-risk (Oct 5, today)
+### Phase 0: Setup and de-risk (done Oct 8)
 
-- [ ] Get testnet USDC from the faucet (`https://faucet.circle.com`) onto the deployer wallet; send 0.01 USDC to yourself
-- [ ] **#3** Install Arc Foundry (`github.com/circlefin/arc-foundry/releases`) → `arc-forge --version`
-- [ ] **#2** With `arc-cast` on testnet: deposit 1 USDC into a mock vault from your wallet, then withdraw it. Repeat against a real vault in a mainnet fork test (free)
-- [ ] Create the repo layout (§3), `git init`, public GitHub repo
-- [ ] Deployer wallet (`arc-cast wallet new`), key in `contracts/.env`, never committed
-- [ ] Find the testnet mock vaults and map the three tiers onto them (Arch §9)
-- [ ] Re-run `exploreVaults({ chain: "Arc" })`; shortlist the mainnet Calm / Steady / Bold vaults (**#8**). Final pick is re-checked before the mainnet deploy
-- [ ] Create the Supabase project; create the Railway or Render account
+- [x] Get testnet USDC from the faucet (`https://faucet.circle.com`) onto the deployer wallet; send 0.01 USDC to yourself
+- [x] **#3** Install Arc Foundry (`github.com/circlefin/arc-foundry/releases`) → `arc-forge --version` (v0.8.0-2)
+- [x] **#2** With `arc-cast` on testnet: deposit 1 USDC into a mock vault from your wallet, then withdraw it. Repeat against a real vault in a mainnet fork test (free). Both returned 0.999999 USDC
+- [x] Create the repo layout (§3), `git init`, public GitHub repo
+- [x] Deployer wallet, key in `contracts/.env`, never committed
+- [x] Find the testnet mock vaults (§2, Arc values). Proposed mapping: Calm and Bold → EarnKit USDC Vault, Steady → MockMorphoVault (Arch §9)
+- [x] Re-run `exploreVaults({ chain: "Arc" })`; shortlist the mainnet Calm / Steady / Bold vaults (**#8**, results in §10). Final pick is re-checked before the mainnet deploy. The Earn Kit answers from a server without an API key
+- [x] Create the Supabase project
+- [ ] Create the Railway or Render account (needed by Phase 2)
 
-### Phase 1: Contract (Oct 6)
+### Phase 1: Contract (Oct 8–9)
 
-- [ ] Write `PamoSavings.sol` (§4, Arch §4.2)
-- [ ] Fork tests against mainnet Morpho vaults (`arc-forge test --network arc`), all of §4's list. This is a local fork, so no real money
-- [ ] Deploy script with the three tier vaults, taking the network and vault addresses from env
-- [ ] Verify a dummy contract on the testnet explorer
+- [x] Settle the open contract decisions (§10), then write `PamoSavings.sol` (§4, Arch §4.2)
+- [x] Fork tests against mainnet Morpho vaults (`arc-forge test --network arc`), all of §4's list. This is a local fork, so no real money
+- [x] Deploy script with the three tier vaults, taking the network and vault addresses from env (`script/Deploy.s.sol`; dry run on testnet estimates about 0.12 USDC)
+- [x] Verify a dummy contract on the testnet explorer (done: `0x9D34a71C39350Bf8AAc8bfA2ACfcfD525A995C14`, verified through Blockscout at `https://explorer.testnet.arc.io/api/`)
 
-### Phase 2: Go live on testnet, ugly (Oct 7)
+### Phase 2: Go live on testnet, ugly (Oct 9)
 
-- [ ] **Deploy to Arc testnet** and verify the source
-- [ ] With `arc-cast`: open a pot, deposit 1 USDC, withdraw it
-- [ ] Express skeleton: `/api/health` + `/api/vaults` with the Earn Kit and 60 s cache
-- [ ] **#4** Test Earn Kit quotes from Express; if they need the user's wallet, plan them client-side
+- [x] **Deploy to Arc testnet** and verify the source: [`0x9952E937378bb093DFA010e94FC81D56EC4cBF17`](https://explorer.testnet.arc.io/address/0x9952E937378bb093DFA010e94FC81D56EC4cBF17)
+- [x] With `arc-cast`: open a pot, deposit 1 USDC, withdraw it (part, then all). A locked goal pot refused an early withdrawal
+- [x] Express skeleton: `/api/health` + `/api/vaults` with the Earn Kit and 60 s cache (runs locally with `pnpm dev` in `server/`)
+- [x] **#4** Test Earn Kit quotes from Express. Deposit quotes work from the server for a wallet that holds the amount. Withdrawal quotes do not work for Pamo, because the Earn Kit only sees positions opened through it (Arch §11; decision in §10)
 - [ ] **#9** Deploy Express to Railway/Render; time a cold request
-- [ ] **#6** Measure Arc RPC `getLogs` range limits
+- [x] **#6** Measure Arc RPC `getLogs` range limits: at most 10,000 blocks per call on both networks, so the indexer reads 9,000 at a time (Arch §11)
 
 > ✅ **Checkpoint 1: "Contract live on testnet."** A deposit and a withdrawal work on the testnet explorer, and `/api/vaults` returns rates. Not a valid submission yet: that needs the mainnet deploy in Phase 6.
 
-### Phase 3: Core flow in the browser (Oct 8)
+### Phase 3: Core flow in the browser (Oct 10)
 
 - [ ] Next.js + Tailwind + TypeScript app; Arc as a custom chain in wagmi/viem; connect wallet
 - [ ] **#7** Test adding Arc in MetaMask on desktop and phone
@@ -421,7 +439,7 @@ Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. 
 
 > ✅ **Checkpoint 2: "Core flow working."** Connect → save → see balance → withdraw, on testnet, in the browser. **Deployed to mainnet, this is the fallback demo.**
 
-### Phase 4: Backend data + the rest of v1 (Oct 9–10)
+### Phase 4: Backend data + the rest of v1 (Oct 10–11)
 
 - [ ] Supabase: run `schema.sql`, RLS on, service key on Express
 - [ ] Indexer: `pots`, `activity`, `indexer_state`; then `vault_snapshots` every 10 min
@@ -435,10 +453,12 @@ Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. 
 
 > ✅ **Checkpoint 3: "All v1 features working."** Ugly but complete, backend included.
 
-### Phase 5: Design system + motion (Oct 11)
+### Phase 5: Design system + motion (Oct 11–12)
 
-- [ ] Tailwind theme tokens: colours, type, spacing, radii (§6 Brand, Brand_Design.md §8)
-- [ ] Apply the brand to every screen: logo, tier chips, cards, sheet
+- [ ] Tailwind theme tokens: copy the `@theme` block from Brand_Design.md §8 (colours, font, spacing, radii, shadow, type scale)
+- [ ] Load Be Vietnam Pro (400, 600, 700) with `next/font`
+- [ ] Logo: the exports in `Brand Kit & Design/Pamo Logos/` are PNG only. Make an SVG wordmark with outlined text for the web app's public folder
+- [ ] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet
 - [ ] Install `motion`, `animejs`, `iconsax-react` in `web/`
 - [ ] `web/motion/`: `tokens.ts`, Motion `variants.ts`, anime.js `countUp.ts`
 - [ ] Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3)
@@ -466,9 +486,9 @@ Today is **Oct 5** and nothing is built yet, so the plan is re-dated from here. 
 ### Phase 7: Story (Oct 13)
 
 - [ ] README: what Pamo is, live URL, contract address + explorer link, architecture diagram (from Arch §2), how to run, roadmap
-- [ ] Add the pseudocode picture to the README
+- [ ] Redraw `pamo-pseudocode.png` first (it shows an older design: tier per user, `apy / 12`), then add it to the README
 - [ ] Record a 2–3 minute demo video: problem → save → goal → calculator → explorer proof
-- [ ] Draft the DoraHacks submission; attach `Pamo_Spec_Arc.pdf`
+- [ ] Draft the DoraHacks submission; attach `Brand Kit & Design/Pamo_Spec_Arc.pdf`
 
 > ✅ **Checkpoint 5: "Polish done."**
 
@@ -490,13 +510,20 @@ At the end of each day, ask: *if I had to submit right now, what would I show?* 
 | Decision | Recommendation | Status |
 |---|---|---|
 | How tiers map to vaults | One vault per tier, showing the honest live rate | Recommended, not confirmed |
-| Which three vaults | Re-check liquidity on Oct 5. Oct 1 snapshot: Calm = Gauntlet USDC Prime, Steady = Keyrock Prime USDC, Bold = Bitwise Premium RWA USDC | Open |
+| Which three vaults | Oct 1 picks were Calm = Gauntlet USDC Prime, Steady = Keyrock Prime USDC, Bold = Bitwise Premium RWA USDC. Oct 8 check: Gauntlet has **0 USDC** available to withdraw, so it is a poor Calm; Steakhouse Prime USDC (`0xbeef0016…7298`, 1.69%, 139,354 USDC available) is the better candidate. Keyrock 1.69% with 138,648 available; Bitwise 4.37% with 41,967 available. Calm and Steady would show the same rate today. Re-check before the mainnet deploy | Open |
+| Where review-screen quotes come from | Deposit: Earn Kit `getDepositQuote` when the wallet holds the amount, else the same fields from `/api/vaults`. Withdrawal: the Earn Kit cannot quote it (test #4), so Express builds it from the chain (`potValue`, `previewWithdraw`) and the vault's `liquidity` from `exploreVaults`; a direct ERC-4626 redeem carries no Circle withdrawal fee | Recommended, not confirmed |
 | Early withdrawal from a Goal pot | Not in v1: the lock is the point | Open |
 | Backend host | Railway or Render: pick whichever has the faster cold start in test #9 | Open |
 | Keep anime.js | Keep unless phone test #10 shows jank | Open |
 | Logo tone-mark spelling | Pamọ́, plain black on white | ✅ Confirmed |
 | Brand colours | White first, black, Pamo green `#0B7A4B` (Brand_Design.md) | ✅ Confirmed |
-| Typeface | One sans that draws ọ́ well; Inter as placeholder | Open |
+| Typeface | Be Vietnam Pro, from the design system | Chosen in the design system |
+| Testnet tier mapping | Only two vaults exist: Calm and Bold → EarnKit USDC Vault, Steady → MockMorphoVault | Recommended, not confirmed |
+| First save in two signatures | `openPot` takes the first deposit, so a first save is Allow, then Save | ✅ Confirmed, built |
+| Goal re-locking | A stored "unlocked" flag: once a goal unlocks it stays unlocked | ✅ Confirmed, built |
+| Owner in events | `Deposited` and `Withdrawn` carry the owner, indexed | ✅ Confirmed, built |
+| Pot name length | Capped at 64 bytes. Names are public onchain | ✅ Confirmed, built |
+| Target reached by money put in | A goal also unlocks when the money put in reaches the target, not only its current value, so depositing exactly the target unlocks it | Built, not confirmed |
 
 ---
 

@@ -134,8 +134,10 @@ Pamo/
 ├── contracts/                     Foundry project (arc-forge)
 │   ├── src/PamoSavings.sol
 │   ├── test/PamoSavings.t.sol     fork tests against Arc mainnet vaults
+│   ├── test/ForkSmoke.t.sol       Arc and vault assumptions (passing)
 │   ├── script/Deploy.s.sol
-│   └── foundry.toml
+│   ├── foundry.toml
+│   └── lib/                       forge-std, OpenZeppelin (git submodules)
 ├── server/                        Node.js + Express + TypeScript
 │   ├── src/
 │   │   ├── index.ts               Express app, routes, CORS, rate limit
@@ -159,6 +161,7 @@ Pamo/
 │   └── motion/                    Motion variants, GSAP timelines, anime.js helpers
 ├── supabase/
 │   └── schema.sql                 tables in §5.3
+├── Brand Kit & Design/            brand kit, design system handoff, logos, mockups
 ├── Docs/
 └── README.md
 ```
@@ -175,13 +178,13 @@ Pamo/
 │ storage     vaultFor[Tier] → address        (admin-set, approved only)    │
 │             pots[id] → Pot                  (owner, kind, tier, vault,    │
 │             potsOf[owner] → id[]             shares, principal, target,   │
-│             nextId                           unlockAt)                    │
+│             nextId                           unlockAt, unlocked)          │
 │                                                                           │
-│ user        openPot(kind, tier, target, unlockAt, name) → id              │
+│ user        openPot(kind, tier, target, unlockAt, name, assets) → id      │
 │             deposit(id, assets)                                           │
 │             withdraw(id, assets)        Anytime: always · Goal: unlocked  │
 │             withdrawAll(id)                                               │
-│ views       potValue(id) · isUnlocked(id) · getPots(owner)                │
+│ views       potValue(id) · isUnlocked(id) · getPot(id) · getPots(owner)   │
 │ admin       setTierVault(tier, vault) · pause() · unpause()               │
 │             (cannot move user funds · pause blocks deposits only)         │
 │ events      PotOpened · Deposited · Withdrawn · TierVaultSet              │
@@ -191,16 +194,18 @@ Pamo/
 ### 4.2 Contract pseudocode
 
 ```text
-openPot(kind, tier, target, unlockAt, name):
+openPot(kind, tier, target, unlockAt, name, assets):   // nonReentrant
     require not paused
+    require name is at most 64 bytes
     vault = vaultFor[tier]
     require vault != 0
     if kind == Goal:
         require target > 0 AND unlockAt > now
     id = nextId++
-    pots[id] = { owner: msg.sender, kind, tier, vault, shares: 0, principal: 0, target, unlockAt }
+    pots[id] = { owner: msg.sender, kind, tier, vault, shares: 0, principal: 0, target, unlockAt, unlocked: false }
     potsOf[msg.sender].push(id)
     emit PotOpened(id, msg.sender, kind, tier, vault, target, unlockAt, name)
+    if assets > 0: same steps as deposit(id, assets)       // first save in one call
 
 deposit(id, assets):                       // nonReentrant
     require not paused
@@ -210,25 +215,28 @@ deposit(id, assets):                       // nonReentrant
     shares = IERC4626(pot.vault).deposit(assets, receiver = this)
     pot.shares    += shares
     pot.principal += assets
-    emit Deposited(id, assets, shares)
+    if pot.kind == Goal and target reached: pot.unlocked = true
+    emit Deposited(id, msg.sender, assets, shares)
 
 withdraw(id, assets):                      // nonReentrant, works even when paused
     pot = pots[id];  require pot.owner == msg.sender
-    if pot.kind == Goal: require isUnlocked(id)
-    value  = potValue(id)
-    require assets <= value
-    burned = IERC4626(pot.vault).withdraw(assets, receiver = pot.owner, owner = this)
-    pot.principal -= pot.principal × assets / value      // pro rata
-    pot.shares    -= burned
-    emit Withdrawn(id, assets, burned)
+    if pot.kind == Goal: require isUnlocked(id);  pot.unlocked = true
+    shares = IERC4626(pot.vault).previewWithdraw(assets)  // shares that cover `assets`, rounded up
+    require 0 < shares <= pot.shares
+    pot.principal -= pot.principal × shares / pot.shares  // pro rata, state first
+    pot.shares    -= shares
+    out = IERC4626(pot.vault).redeem(shares, receiver = pot.owner, owner = this)
+    emit Withdrawn(id, pot.owner, out, shares)
 
-withdrawAll(id):                           // same rules
-    assets = IERC4626(pot.vault).redeem(pot.shares, receiver = pot.owner, owner = this)
+withdrawAll(id):                           // same rules, shares = pot.shares
     pot.shares = 0;  pot.principal = 0
-    emit Withdrawn(id, assets, sharesRedeemed)
+    out = IERC4626(pot.vault).redeem(shares, receiver = pot.owner, owner = this)
+    emit Withdrawn(id, pot.owner, out, shares)
 
 potValue(id)   = IERC4626(pot.vault).previewRedeem(pot.shares)
-isUnlocked(id) = potValue(id) >= pot.target  OR  now >= pot.unlockAt
+isUnlocked(id) = pot.unlocked  OR  now >= pot.unlockAt
+                 OR  potValue(id) >= pot.target  OR  pot.principal >= pot.target
+                 // once unlocked, a goal stays unlocked
 
 setTierVault(tier, vault):                 // onlyOwner
     require IERC4626(vault).asset() == USDC
@@ -239,7 +247,7 @@ setTierVault(tier, vault):                 // onlyOwner
 ### 4.3 Arc rules the contract obeys
 
 1. USDC only through the ERC-20 interface (6 dp); never `msg.value` or `address(this).balance` (18 dp).
-2. Vault shares are 18 dp; convert with `previewRedeem` / `convertToAssets`.
+2. Vault shares use the vault's own decimals (18 on the mainnet vaults, 6 on one testnet mock); never hard-code them. Convert with `previewRedeem` / `convertToAssets`, and read `decimals()` to display shares.
 3. Never gate on `maxDeposit` / `maxWithdraw` (return 0 on Morpho Vault V2).
 4. Withdrawals can revert when a vault is short on cash; surface it, don't hide it.
 5. USDC to blocklisted or zero addresses reverts; funds always go back to `pot.owner`.
@@ -332,7 +340,7 @@ create table indexer_state (
 ```text
 every 5 seconds:
     from = indexer_state.last_block + 1
-    to   = min(latest_block, from + BATCH)          // BATCH sized to the RPC's getLogs limit
+    to   = min(latest_block, from + BATCH)          // BATCH = 9,000: the RPC refuses ranges over 9,999 (§11, #6)
     logs = rpc.getLogs(PamoSavings, events = [PotOpened, Deposited, Withdrawn], from, to)
     for log in logs (ordered by block, then log_index):
         PotOpened → upsert into pots
@@ -435,7 +443,7 @@ An `arcTestnet` chain (id `5042002`, RPC `https://rpc.testnet.arc.io`, explorer 
   │ "Allow"       │                       │              │                   │                     │
   ├──────────────►├── USDC.approve(PamoSavings, amount) ────────────────────►│                     │
   │ "Save"        │                       │              │                   │                     │
-  ├──────────────►├── openPot(...) then deposit(id, amount) ────────────────►│                     │
+  ├──────────────►├── openPot(..., amount)   (one call: opens and deposits) ─►│                     │
   │               │                       │              │                   ├─ transferFrom ─────►│
   │               │                       │              │                   ├─ vault.deposit ────►│
   │               │                       │              │                   │◄──── shares ────────┤
@@ -451,12 +459,12 @@ saveFlow(input):
     tierData = GET /api/vaults → tiers[input.tier]
     quote    = POST /api/quotes/deposit { owner, tier, amount }      // may fail → show "rates unavailable", still allow
     preview  = read vault.previewDeposit(amount)
-    gas      = estimateGas(approve) + estimateGas(openPot) + estimateGas(deposit)
+    gas      = estimateGas(approve) + estimateGas(openPot with the amount)
     show ReviewSheet(amount, tierData, quote, preview, gas, warnings)
 
     on "Allow":   if allowance < amount → send USDC.approve(PamoSavings, amount)
-    on "Save":    if new pot → send openPot(kind, tier, target, unlockAt, name) → read id from event
-                  send deposit(id, amount)
+    on "Save":    if new pot → send openPot(kind, tier, target, unlockAt, name, amount) → read id from event
+                  else       → send deposit(id, amount)
                   wait for receipt (status 1) → show success, refetch getPots
                   on revert → show plain-English error + explorer link
 ```
@@ -628,7 +636,7 @@ appLayout():
 
 **Testnet first, then mainnet.** Everything is built and proven on testnet with faucet USDC. Moving to mainnet is a fresh deploy of `PamoSavings` plus a config change: the chain ID, RPC URL, contract address, tier vaults and Circle API key all come from the variables above, so no code changes.
 
-- Testnet has only two mock vaults, so two tiers share a vault there, or we deploy our own mock ERC-4626 for the third.
+- Testnet has only two vaults: EarnKit USDC Vault (`0xaabbef1d3971c710276ed41ec791bbe14cdb8e88`, 18-decimal shares) and MockMorphoVault (`0x8f2d33b5d4b9b5f02df635ae308f7b4c9da8d2dc`, 6-decimal shares). Two tiers share one there: Calm and Bold on the first, Steady on the second.
 - Mock vaults don't behave exactly like the real ones, so the fork tests still run against real mainnet vaults on a local fork. That costs nothing.
 - Testnet rates and liquidity are not real. Honest live numbers only appear on mainnet.
 
@@ -671,5 +679,16 @@ Ordered by how badly they could block the build. Each has a quick test to run **
 | 8 | **Low-liquidity withdrawals** | "Anytime" breaks if the vault has no cash | Re-check `liquidity` for the three tier vaults on deploy day; pick liquid ones for Calm | Oct 6 |
 | 9 | **Backend hosting cold starts** | Free tiers sleep, first request slow | Deploy a hello-world Express to Railway/Render and time a cold request | Oct 7 |
 | 10 | **Motion performance on phones** | Three animation libs can make it janky | Test the landing hero and count-ups on a mid-range phone; drop anime.js first if needed | Oct 11 |
+
+**Results so far (Oct 9)**
+
+- **#2 done.** A 1 USDC deposit and redeem returned 0.999999 USDC from a wallet on testnet, and from a contract on a mainnet fork across five real vaults (`contracts/test/ForkSmoke.t.sol`).
+- **#3 done.** Arc Foundry v0.8.0-2 is installed and fork tests pass. Under plain Foundry the same USDC transfer reverts, so `arc-forge` is required.
+- **#4 done.** `exploreVaults` works from a server with no API key, on testnet and mainnet. Quotes tested from a server on testnet (Oct 9) with a read-only adapter that only reports an address:
+  - `getDepositQuote` works (0.7 to 2.2 s) and returns the share price, APY, fees and expected shares, but only when the quoted wallet holds the amount. Otherwise it fails with "The wallet does not hold enough tokens for this deposit". Its gas estimate is for the Earn Kit's own approve and deposit, not Pamo's calls.
+  - `getWithdrawalQuote` does **not** work for Pamo. It answers "The wallet holds no withdrawable position in this vault" for the user's wallet and also for the PamoSavings address, which held 998310 shares of that vault at the time. The Earn Kit only counts positions opened through the Earn Kit. Moving quotes client-side would not change this, so the withdrawal review needs another source (Build Guide §10).
+- **#6 done.** `eth_getLogs` on the public RPC accepts at most 10,000 blocks per call (`toBlock − fromBlock` ≤ 9,999) on testnet and mainnet; anything larger fails with `-32012 requested range too large`. Blocks come about every 0.5 s, so 10,000 blocks is about 84 minutes and a day of backlog is about 17 calls. The indexer uses `BATCH = 9,000` and starts at the deploy block.
+- **#8 checked.** Gauntlet USDC Prime had 0 USDC available on mainnet, so the Calm pick needs changing (Build Guide §10).
+- New finding: `maxDeposit` and `maxWithdraw` return 0 on the real vaults even when deposits and withdrawals work, as §4.3 rule 3 says.
 
 **Fallback if the backend is late or broken:** the frontend can read everything essential straight from the chain (`getPots`, `potValue`), and the Earn Kit can be called without a key for rates. Saving and withdrawing never depend on Express or Supabase.
