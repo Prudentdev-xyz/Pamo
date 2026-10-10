@@ -680,7 +680,7 @@ Ordered by how badly they could block the build. Each has a quick test to run **
 | 9 | **Backend hosting cold starts** | Free tiers sleep, first request slow | Deploy a hello-world Express to Railway/Render and time a cold request | Oct 7 |
 | 10 | **Motion performance on phones** | Three animation libs can make it janky | Test the landing hero and count-ups on a mid-range phone; drop anime.js first if needed | Oct 11 |
 
-**Results so far (Oct 9)**
+**Results so far (Oct 10)**
 
 - **#2 done.** A 1 USDC deposit and redeem returned 0.999999 USDC from a wallet on testnet, and from a contract on a mainnet fork across five real vaults (`contracts/test/ForkSmoke.t.sol`).
 - **#3 done.** Arc Foundry v0.8.0-2 is installed and fork tests pass. Under plain Foundry the same USDC transfer reverts, so `arc-forge` is required.
@@ -688,7 +688,9 @@ Ordered by how badly they could block the build. Each has a quick test to run **
   - `getDepositQuote` works (0.7 to 2.2 s) and returns the share price, APY, fees and expected shares, but only when the quoted wallet holds the amount. Otherwise it fails with "The wallet does not hold enough tokens for this deposit". Its gas estimate is for the Earn Kit's own approve and deposit, not Pamo's calls.
   - `getWithdrawalQuote` does **not** work for Pamo. It answers "The wallet holds no withdrawable position in this vault" for the user's wallet and also for the PamoSavings address, which held 998310 shares of that vault at the time. The Earn Kit only counts positions opened through the Earn Kit. Moving quotes client-side would not change this, so the withdrawal review needs another source (Build Guide §10).
 - **#6 done.** `eth_getLogs` on the public RPC accepts at most 10,000 blocks per call (`toBlock − fromBlock` ≤ 9,999) on testnet and mainnet; anything larger fails with `-32012 requested range too large`. Blocks come about every 0.5 s, so 10,000 blocks is about 84 minutes and a day of backlog is about 17 calls. The indexer uses `BATCH = 9,000` and starts at the deploy block.
+- **#7 partly done.** With MetaMask on desktop, the app's "Switch to Arc Testnet" button switched the wallet to Arc and the full save and withdraw flow then worked. MetaMask may already have known the network, so adding it from scratch is not confirmed. The phone check is still open; it needs the web app on a public URL.
 - **#8 checked.** Gauntlet USDC Prime had 0 USDC available on mainnet, so the Calm pick needs changing (Build Guide §10).
+- **#9 done.** Express runs on Render's free plan at `https://pamo-ttyk.onrender.com`. After 18 minutes with no traffic the first request took **38.9 s**; warm requests take 0.4 to 0.9 s. A free instance sleeps after about 15 minutes idle, so the indexer would stop too. A GitHub Actions job now pings `/api/health` every 10 minutes to keep it awake (`.github/workflows/keep-awake.yml`); a paid instance is the fallback if scheduled runs arrive late. Railway was not timed.
 - New finding: `maxDeposit` and `maxWithdraw` return 0 on the real vaults even when deposits and withdrawals work, as §4.3 rule 3 says.
 
 **Fallback if the backend is late or broken:** the frontend can read everything essential straight from the chain (`getPots`, `potValue`), and the Earn Kit can be called without a key for rates. Saving and withdrawing never depend on Express or Supabase.

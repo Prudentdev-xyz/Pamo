@@ -407,7 +407,7 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [x] Find the testnet mock vaults (§2, Arc values). Proposed mapping: Calm and Bold → EarnKit USDC Vault, Steady → MockMorphoVault (Arch §9)
 - [x] Re-run `exploreVaults({ chain: "Arc" })`; shortlist the mainnet Calm / Steady / Bold vaults (**#8**, results in §10). Final pick is re-checked before the mainnet deploy. The Earn Kit answers from a server without an API key
 - [x] Create the Supabase project
-- [ ] Create the Railway or Render account (needed by Phase 2)
+- [x] Create the Railway or Render account (Render)
 
 ### Phase 1: Contract (Oct 8–9)
 
@@ -422,20 +422,20 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [x] With `arc-cast`: open a pot, deposit 1 USDC, withdraw it (part, then all). A locked goal pot refused an early withdrawal
 - [x] Express skeleton: `/api/health` + `/api/vaults` with the Earn Kit and 60 s cache (runs locally with `pnpm dev` in `server/`)
 - [x] **#4** Test Earn Kit quotes from Express. Deposit quotes work from the server for a wallet that holds the amount. Withdrawal quotes do not work for Pamo, because the Earn Kit only sees positions opened through it (Arch §11; decision in §10)
-- [ ] **#9** Deploy Express to Railway/Render; time a cold request
+- [x] **#9** Deploy Express to Render (`https://pamo-ttyk.onrender.com`); a cold request took 38.9 s on the free plan, warm ones under 1 s (Arch §11; decision in §10)
 - [x] **#6** Measure Arc RPC `getLogs` range limits: at most 10,000 blocks per call on both networks, so the indexer reads 9,000 at a time (Arch §11)
 
 > ✅ **Checkpoint 1: "Contract live on testnet."** A deposit and a withdrawal work on the testnet explorer, and `/api/vaults` returns rates. Not a valid submission yet: that needs the mainnet deploy in Phase 6.
 
 ### Phase 3: Core flow in the browser (Oct 10)
 
-- [ ] Next.js + Tailwind + TypeScript app; Arc as a custom chain in wagmi/viem; connect wallet
-- [ ] **#7** Test adding Arc in MetaMask on desktop and phone
-- [ ] `/app` guards: wallet, network, backend-down banner (Arch §8.3)
-- [ ] Dashboard reads `getPots(user)` and USDC `balanceOf`
-- [ ] Open an Anytime pot → Allow → Save → see the value
-- [ ] Withdraw part and withdraw all
-- [ ] Raw styling, **no animation yet**
+- [x] Next.js + Tailwind + TypeScript app; Arc as a custom chain in wagmi/viem; connect wallet
+- [ ] **#7** Test adding Arc in MetaMask on desktop and phone (switching works on desktop; adding from scratch and the phone are still to do)
+- [x] `/app` guards: wallet, network, backend-down banner (Arch §8.3)
+- [x] Dashboard reads `getPots(user)` and USDC `balanceOf`
+- [x] Open an Anytime pot → Allow → Save → see the value
+- [x] Withdraw part and withdraw all
+- [x] Raw styling, **no animation yet**
 
 > ✅ **Checkpoint 2: "Core flow working."** Connect → save → see balance → withdraw, on testnet, in the browser. **Deployed to mainnet, this is the fallback demo.**
 
@@ -513,7 +513,7 @@ At the end of each day, ask: *if I had to submit right now, what would I show?* 
 | Which three vaults | Oct 1 picks were Calm = Gauntlet USDC Prime, Steady = Keyrock Prime USDC, Bold = Bitwise Premium RWA USDC. Oct 8 check: Gauntlet has **0 USDC** available to withdraw, so it is a poor Calm; Steakhouse Prime USDC (`0xbeef0016…7298`, 1.69%, 139,354 USDC available) is the better candidate. Keyrock 1.69% with 138,648 available; Bitwise 4.37% with 41,967 available. Calm and Steady would show the same rate today. Re-check before the mainnet deploy | Open |
 | Where review-screen quotes come from | Deposit: Earn Kit `getDepositQuote` when the wallet holds the amount, else the same fields from `/api/vaults`. Withdrawal: the Earn Kit cannot quote it (test #4), so Express builds it from the chain (`potValue`, `previewWithdraw`) and the vault's `liquidity` from `exploreVaults`; a direct ERC-4626 redeem carries no Circle withdrawal fee | Recommended, not confirmed |
 | Early withdrawal from a Goal pot | Not in v1: the lock is the point | Open |
-| Backend host | Railway or Render: pick whichever has the faster cold start in test #9 | Open |
+| Backend host | Render is live. Its free plan sleeps when idle (38.9 s cold start in test #9), which would also stop the indexer. A GitHub Actions job pings `/api/health` every 10 minutes to keep it awake (`.github/workflows/keep-awake.yml`). GitHub can run scheduled jobs late, so move to a paid instance if the server still sleeps; Railway was not timed | Chosen for the build, re-check before mainnet |
 | Keep anime.js | Keep unless phone test #10 shows jank | Open |
 | Logo tone-mark spelling | Pamọ́, plain black on white | ✅ Confirmed |
 | Brand colours | White first, black, Pamo green `#0B7A4B` (Brand_Design.md) | ✅ Confirmed |
