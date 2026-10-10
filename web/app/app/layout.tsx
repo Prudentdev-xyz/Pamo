@@ -20,8 +20,8 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-black pb-3">
-        <Link href="/app" className="text-xl font-bold">
-          Pamo
+        <Link href="/app" aria-label="Pamo" className="text-xl font-bold">
+          Pamọ́
         </Link>
         {address && (
           <div className="flex items-center gap-3 text-sm">
