@@ -441,15 +441,15 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 
 ### Phase 4: Backend data + the rest of v1 (Oct 10–11)
 
-- [ ] Supabase: run `schema.sql`, RLS on, service key on Express (the schema is run on the Supabase project and the keys are on Render; the server code that uses them is not deployed yet)
-- [x] Indexer: `pots`, `activity`, `indexer_state`; then `vault_snapshots` every 10 min (read every testnet event since the deploy block into a local database; it starts on the host once the Supabase keys are set)
+- [x] Supabase: run `schema.sql`, RLS on, service key on Express
+- [x] Indexer: `pots`, `activity`, `indexer_state`; then `vault_snapshots` every 10 min (running on Render: it read every testnet event since the deploy block into Supabase and keeps level with the chain)
 - [x] Routes: `/api/quotes/*`, `/api/owners/:addr/activity`, `/api/owners/:addr/pots`, `/api/pots/:id`, `/api/vaults/history`; zod + rate limit + CORS
 - [x] Goal pots: create flow, progress bar, lock rules in the UI (a goal was opened through the app on testnet and shows as locked)
 - [x] New pot stepper (state machine from Arch §8.2)
 - [ ] Review screens for save and withdraw (§6) (a real save went through the save review; a withdrawal through the withdrawal review is still to run)
 - [x] Portfolios page with live tier data and rate history (the history line fills in once snapshots are being stored)
 - [x] Growth Calculator with the Recharts curve (checked against the formula: 100 + 50 a month for 12 months at 4.20% gives 717.76)
-- [x] Pot detail with activity from Supabase (shown from a local database; live once the Supabase keys are set)
+- [x] Pot detail with activity from Supabase
 
 > ✅ **Checkpoint 3: "All v1 features working."** Ugly but complete, backend included.
 
