@@ -190,8 +190,8 @@ Endpoints, schema and indexer pseudocode: **Arch §5**.
 |---|---|---|
 | `GET /api/health` | Returns `{ ok, indexedBlock, chainBlock }` | Responds on the hosted URL |
 | `GET /api/vaults` | Earn Kit `exploreVaults` → keep the 3 tier vaults (read `vaultFor` from the contract) → cache 60 s | Returns live APY, fees, liquidity, status per tier |
-| `POST /api/quotes/deposit` · `/withdraw` | Earn Kit quotes (see risk #4) | Review screens show fees and liquidity warnings |
-| `GET /api/owners/:addr/activity` · `GET /api/pots/:id` | Read from Supabase | Pot detail shows names and history |
+| `POST /api/quotes/deposit` · `/withdraw` | Deposit: Earn Kit `getDepositQuote`, falling back to the vault's own numbers when the wallet does not hold the amount. Withdrawal: built from the chain and the vault's liquidity (see risk #4) | Review screens show fees and liquidity warnings |
+| `GET /api/owners/:addr/activity` · `GET /api/owners/:addr/pots` · `GET /api/pots/:id` | Read from Supabase | Dashboard and pot detail show names and history |
 | Indexer | Every 5 s: `getLogs` on PamoSavings → upsert `pots` / insert `activity`; every 10 min: `vault_snapshots` | New deposits appear in history within seconds |
 | Supabase | Run `supabase/schema.sql`; RLS on, no public policies; service key on Express only | Tables exist; anon key can read nothing |
 | Safety | zod on every input, IP rate limit, CORS to the Vercel domain only | Bad input returns 400, not a crash |
@@ -441,15 +441,15 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 
 ### Phase 4: Backend data + the rest of v1 (Oct 10–11)
 
-- [ ] Supabase: run `schema.sql`, RLS on, service key on Express
-- [ ] Indexer: `pots`, `activity`, `indexer_state`; then `vault_snapshots` every 10 min
-- [ ] Routes: `/api/quotes/*`, `/api/owners/:addr/activity`, `/api/pots/:id`, `/api/vaults/history`; zod + rate limit + CORS
-- [ ] Goal pots: create flow, progress bar, lock rules in the UI
-- [ ] New pot stepper (state machine from Arch §8.2)
-- [ ] Review screens for save and withdraw (§6)
-- [ ] Portfolios page with live tier data and rate history
-- [ ] Growth Calculator with the Recharts curve
-- [ ] Pot detail with activity from Supabase
+- [ ] Supabase: run `schema.sql`, RLS on, service key on Express (the schema is run on the Supabase project and the keys are on Render; the server code that uses them is not deployed yet)
+- [x] Indexer: `pots`, `activity`, `indexer_state`; then `vault_snapshots` every 10 min (read every testnet event since the deploy block into a local database; it starts on the host once the Supabase keys are set)
+- [x] Routes: `/api/quotes/*`, `/api/owners/:addr/activity`, `/api/owners/:addr/pots`, `/api/pots/:id`, `/api/vaults/history`; zod + rate limit + CORS
+- [x] Goal pots: create flow, progress bar, lock rules in the UI (a goal was opened through the app on testnet and shows as locked)
+- [x] New pot stepper (state machine from Arch §8.2)
+- [ ] Review screens for save and withdraw (§6) (a real save went through the save review; a withdrawal through the withdrawal review is still to run)
+- [x] Portfolios page with live tier data and rate history (the history line fills in once snapshots are being stored)
+- [x] Growth Calculator with the Recharts curve (checked against the formula: 100 + 50 a month for 12 months at 4.20% gives 717.76)
+- [x] Pot detail with activity from Supabase (shown from a local database; live once the Supabase keys are set)
 
 > ✅ **Checkpoint 3: "All v1 features working."** Ugly but complete, backend included.
 
@@ -511,8 +511,8 @@ At the end of each day, ask: *if I had to submit right now, what would I show?* 
 |---|---|---|
 | How tiers map to vaults | One vault per tier, showing the honest live rate | Recommended, not confirmed |
 | Which three vaults | Oct 1 picks were Calm = Gauntlet USDC Prime, Steady = Keyrock Prime USDC, Bold = Bitwise Premium RWA USDC. Oct 8 check: Gauntlet has **0 USDC** available to withdraw, so it is a poor Calm; Steakhouse Prime USDC (`0xbeef0016…7298`, 1.69%, 139,354 USDC available) is the better candidate. Keyrock 1.69% with 138,648 available; Bitwise 4.37% with 41,967 available. Calm and Steady would show the same rate today. Re-check before the mainnet deploy | Open |
-| Where review-screen quotes come from | Deposit: Earn Kit `getDepositQuote` when the wallet holds the amount, else the same fields from `/api/vaults`. Withdrawal: the Earn Kit cannot quote it (test #4), so Express builds it from the chain (`potValue`, `previewWithdraw`) and the vault's `liquidity` from `exploreVaults`; a direct ERC-4626 redeem carries no Circle withdrawal fee | Recommended, not confirmed |
-| Early withdrawal from a Goal pot | Not in v1: the lock is the point | Open |
+| Where review-screen quotes come from | Deposit: Earn Kit `getDepositQuote` when the wallet holds the amount, else the same fields from `/api/vaults`. Withdrawal: the Earn Kit cannot quote it (test #4), so Express builds it from the chain (`potValue`, `previewWithdraw`) and the vault's `liquidity` from `exploreVaults`; a direct ERC-4626 redeem carries no Circle withdrawal fee | Built this way in Phase 4 |
+| Early withdrawal from a Goal pot | Not in v1: the lock is the point | Built this way in Phase 4 |
 | Backend host | Render is live. Its free plan sleeps when idle (38.9 s cold start in test #9), which would also stop the indexer. A GitHub Actions job pings `/api/health` every 10 minutes to keep it awake (`.github/workflows/keep-awake.yml`). GitHub can run scheduled jobs late, so move to a paid instance if the server still sleeps; Railway was not timed | Chosen for the build, re-check before mainnet |
 | Keep anime.js | Keep unless phone test #10 shows jank | Open |
 | Logo tone-mark spelling | Pamọ́, plain black on white | ✅ Confirmed |

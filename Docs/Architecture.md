@@ -274,9 +274,10 @@ setTierVault(tier, vault):                 // onlyOwner
 | `GET /api/health` | | `{ ok, indexedBlock, chainBlock }` | Supabase + RPC |
 | `GET /api/vaults` | | `{ asOf, tiers: { calm, steady, bold }: { vaultAddress, name, curator, apy, apy7d, fees: { performance, management }, liquidity, totalDeposits, status, warnings[] } }` | Earn Kit, filtered to the three tier vaults read from `vaultFor` |
 | `GET /api/vaults/history?tier=` | tier | `[{ at, apy, liquidity }]` | Supabase `vault_snapshots` |
-| `POST /api/quotes/deposit` | `{ owner, tier, amount }` | `{ sharePrice, apy, fees[], warnings[] }` | Earn Kit `getDepositQuote` |
-| `POST /api/quotes/withdraw` | `{ owner, potId, amount }` | `{ withdrawalFee, maxWithdrawable, warnings[] }` | Earn Kit `getWithdrawalQuote` |
-| `GET /api/owners/:address/activity` | address | `[{ potId, type, assets, shares, txHash, block, at }]` | Supabase `activity` |
+| `POST /api/quotes/deposit` | `{ owner, tier, amount, potId? }` (amount in integer units, as a string) | `{ source, vault, vaultName, sharePrice, apy, vaultFees, fees[], expectedShares, shareDecimals, liquidity, warnings[] }` | Earn Kit `getDepositQuote` when the wallet holds the amount (`source: "earn-kit"`), else the vault itself (`source: "chain"`) |
+| `POST /api/quotes/withdraw` | `{ owner, potId, amount }` | `{ vault, value, unlocked, sharesToRedeem, shareDecimals, withdrawalFee, liquidity, maxWithdrawable, warnings[] }` | Chain (`getPot`, `potValue`, `isUnlocked`, `previewWithdraw`) plus the vault's liquidity from the Earn Kit. The Earn Kit cannot quote a Pamo withdrawal (§11, #4) |
+| `GET /api/owners/:address/activity` | address, optional `potId` and `limit` | `[{ potId, type, assets, shares, txHash, block, at }]` | Supabase `activity` |
+| `GET /api/owners/:address/pots` | address | `[{ id, name, kind, tier, vault, target, unlockAt }]` | Supabase `pots`: every name for one dashboard in one call |
 | `GET /api/pots/:id` | pot id | `{ id, name, kind, tier, target, unlockAt }` | Supabase `pots` (names come from events) |
 
 All inputs are validated with zod. Rate limit by IP. CORS allows only the Vercel domain.
@@ -623,7 +624,8 @@ appLayout():
 | `CHAIN_ID`, `NEXT_PUBLIC_CHAIN_ID` | server, web | `5042002` during the build, `5042` for the release |
 | `PAMO_SAVINGS_ADDRESS` | server, web | Deployed contract |
 | `CIRCLE_API_KEY` | server only | Earn Kit rate limit. Mainnet and testnet keys differ |
-| `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` | server only | Database access |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` | server only | Database access. Without them the server still runs, with the indexer and history routes off |
+| `PAMO_SAVINGS_DEPLOY_BLOCK` | server only | Block the contract was deployed at; the indexer starts reading there |
 | `NEXT_PUBLIC_API_URL` | web | Express base URL |
 | `NEXT_PUBLIC_PAMO_SAVINGS_ADDRESS` | web | Contract address for wagmi |
 | `ALLOWED_ORIGIN` | server | CORS: the Vercel domain |
