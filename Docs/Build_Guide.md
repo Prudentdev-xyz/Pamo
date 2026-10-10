@@ -430,7 +430,7 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 ### Phase 3: Core flow in the browser (Oct 10)
 
 - [x] Next.js + Tailwind + TypeScript app; Arc as a custom chain in wagmi/viem; connect wallet
-- [ ] **#7** Test adding Arc in MetaMask on desktop and phone (switching works on desktop; adding from scratch and the phone are still to do)
+- [ ] **#7** Test adding Arc in MetaMask on desktop and phone (desktop works; phone still to do, once the web app has a public URL)
 - [x] `/app` guards: wallet, network, backend-down banner (Arch §8.3)
 - [x] Dashboard reads `getPots(user)` and USDC `balanceOf`
 - [x] Open an Anytime pot → Allow → Save → see the value
