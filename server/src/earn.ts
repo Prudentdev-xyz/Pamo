@@ -76,3 +76,49 @@ export async function getTierVaults(): Promise<VaultsResponse> {
     });
   return inFlight;
 }
+
+export interface EarnDepositQuote {
+  /** USDC per share, as a decimal string. */
+  sharePrice: string;
+  apy: number;
+  /** Fees taken from the deposit itself. Empty when there are none. */
+  fees: { symbol: string; amount: string }[];
+}
+
+const QUOTE_TIMEOUT_MS = 4_000;
+
+/**
+ * The Earn Kit's deposit quote for one wallet and vault, or null when it cannot give one.
+ * It only quotes a wallet that holds the amount, so a null here is normal (Architecture §11, #4).
+ */
+export async function getEarnDepositQuote(owner: string, vaultAddress: string, amount: string): Promise<EarnDepositQuote | null> {
+  // The kit only asks this adapter who the wallet is. It can never sign: this server holds no keys.
+  const readOnly = async () => {
+    throw new Error("read-only adapter");
+  };
+  const adapter = { getAddress: async () => owner, validateChainSupport: async () => {}, prepare: readOnly, waitForTransaction: readOnly };
+
+  let timer: NodeJS.Timeout | undefined;
+  try {
+    const quote = await Promise.race([
+      kit.getDepositQuote({
+        from: { adapter: adapter as never, chain: earnChain },
+        vaultAddress,
+        amount,
+        ...(config.circleApiKey ? { config: { apiKey: config.circleApiKey } } : {}),
+      }),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => reject(new Error("timed out")), QUOTE_TIMEOUT_MS);
+      }),
+    ]);
+    return {
+      sharePrice: String(quote.sharePrice),
+      apy: quote.currentApy,
+      fees: quote.fees.map((f) => ({ symbol: f.symbol, amount: f.amount })),
+    };
+  } catch {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
