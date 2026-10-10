@@ -16,11 +16,14 @@ export function SaveSteps({
   amount,
   save,
   onSaved,
+  beforeSend,
 }: {
   /** Null until the form holds a valid amount. */
   amount: bigint | null;
   save: (onSent: OnSent) => Promise<void>;
   onSaved?: () => void;
+  /** Runs right before the wallet opens, to refresh what the review shows. */
+  beforeSend?: () => Promise<void>;
 }) {
   const { address } = useConnection();
   const queryClient = useQueryClient();
@@ -42,12 +45,18 @@ export function SaveSteps({
   async function onAllow() {
     if (amount === null) return;
     saving.reset();
-    const result = await allow.run((onSent) => allowUsdc(amount, onSent));
+    const result = await allow.run(async (onSent) => {
+      await beforeSend?.().catch(() => {});
+      return allowUsdc(amount, onSent);
+    });
     if (result.ok) await allowance.refetch();
   }
 
   async function onSave() {
-    const result = await saving.run(save);
+    const result = await saving.run(async (onSent) => {
+      await beforeSend?.().catch(() => {});
+      return save(onSent);
+    });
     if (!result.ok) return;
     await queryClient.invalidateQueries();
     onSaved?.();

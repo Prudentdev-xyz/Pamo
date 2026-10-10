@@ -2,13 +2,16 @@
 
 import Link from "next/link";
 import { useConnection, useReadContract } from "wagmi";
-import { fallbackPotName, KIND_GOAL, KINDS, PAMO_SAVINGS, pamoSavingsAbi, TIER_KEYS, TIERS } from "@/lib/contract";
+import { PotCard } from "@/components/PotCard";
+import { PAMO_SAVINGS, pamoSavingsAbi, TIER_KEYS, TIERS } from "@/lib/contract";
 import { formatApy, formatUsdc } from "@/lib/format";
+import { usePotInfo } from "@/lib/usePotInfo";
 import { useVaults } from "@/lib/useVaults";
 
 export default function Dashboard() {
   const { address } = useConnection();
   const vaults = useVaults();
+  const info = usePotInfo();
   const pots = useReadContract({
     address: PAMO_SAVINGS,
     abi: pamoSavingsAbi,
@@ -58,12 +61,17 @@ export default function Dashboard() {
         </section>
       )}
 
-      <Link
-        href="/app/new"
-        className="inline-block rounded border border-black bg-black px-4 py-2 font-semibold text-white"
-      >
-        New Anytime Vault
-      </Link>
+      <div className="flex flex-wrap gap-2">
+        <Link
+          href="/app/new?kind=anytime"
+          className="inline-block rounded border border-black bg-black px-4 py-2 font-semibold text-white"
+        >
+          New Anytime Vault
+        </Link>
+        <Link href="/app/new?kind=goal" className="inline-block rounded border border-black px-4 py-2 font-semibold">
+          New Goal
+        </Link>
+      </div>
 
       <section>
         <h2 className="font-semibold">Your pots</h2>
@@ -71,23 +79,9 @@ export default function Dashboard() {
           <p className="mt-2">Nothing saved yet. Start with any amount.</p>
         ) : (
           <ul className="mt-2 space-y-2">
-            {pots.data.map(({ id, pot, value, unlocked }) => (
-              <li key={id.toString()}>
-                <Link href={`/app/pot/${id}`} className="block rounded border border-black px-4 py-3">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <span className="font-semibold">{fallbackPotName(pot.kind, id)}</span>
-                    <span className="font-semibold tabular-nums">{formatUsdc(value)}</span>
-                  </div>
-                  <div className="mt-1 flex items-baseline justify-between gap-3 text-sm">
-                    <span>
-                      {KINDS[pot.kind]} · {TIERS[pot.tier]}
-                      {pot.kind === KIND_GOAL && (unlocked ? " · unlocked" : " · locked")}
-                    </span>
-                    <span className="tabular-nums">
-                      Earned {formatUsdc(value > pot.principal ? value - pot.principal : 0n)}
-                    </span>
-                  </div>
-                </Link>
+            {pots.data.map((view) => (
+              <li key={view.id.toString()}>
+                <PotCard {...view} name={info.byId.get(view.id.toString())?.name} />
               </li>
             ))}
           </ul>

@@ -20,9 +20,17 @@ export default function AppLayout({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto max-w-2xl px-4 py-6">
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-black pb-3">
-        <Link href="/app" aria-label="Pamo" className="text-xl font-bold">
-          Pamọ́
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/app" aria-label="Pamo" className="text-xl font-bold">
+            Pamọ́
+          </Link>
+          <Link href="/portfolios" className="text-sm underline">
+            Portfolios
+          </Link>
+          <Link href="/calculator" className="text-sm underline">
+            Calculator
+          </Link>
+        </div>
         {address && (
           <div className="flex items-center gap-3 text-sm">
             {onArc && balance.data !== undefined && <span>In wallet: {formatUsdc(balance.data)}</span>}

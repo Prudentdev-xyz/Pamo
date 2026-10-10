@@ -1,5 +1,5 @@
 import { BaseError, ContractFunctionRevertedError, parseEventLogs, parseGwei, UserRejectedRequestError } from "viem";
-import type { Hash, TransactionReceipt } from "viem";
+import type { Hash, PublicClient, TransactionReceipt } from "viem";
 import { getPublicClient, waitForTransactionReceipt, writeContract } from "wagmi/actions";
 import { chain } from "./chain";
 import { erc20Abi, pamoSavingsAbi, PAMO_SAVINGS, USDC } from "./contract";
@@ -19,6 +19,22 @@ async function fees() {
     estimate?.maxFeePerGas && estimate.maxFeePerGas > MIN_FEE_PER_GAS ? estimate.maxFeePerGas : MIN_FEE_PER_GAS;
   const tip = estimate?.maxPriorityFeePerGas ?? 0n;
   return { maxFeePerGas, maxPriorityFeePerGas: tip < maxFeePerGas ? tip : maxFeePerGas };
+}
+
+/**
+ * What a call would cost in network fees, in Arc's native USDC (18 dp), or null when it cannot be
+ * estimated yet. A save cannot be estimated before the Allow step: the transfer inside it would fail.
+ */
+export async function estimateNetworkFee(
+  estimateGas: (client: PublicClient) => Promise<bigint>,
+): Promise<bigint | null> {
+  try {
+    const client = getPublicClient(wagmiConfig, { chainId: chain.id }) as PublicClient;
+    const [gas, gasPrice] = await Promise.all([estimateGas(client), client.getGasPrice()]);
+    return gas * (gasPrice > MIN_FEE_PER_GAS ? gasPrice : MIN_FEE_PER_GAS);
+  } catch {
+    return null;
+  }
 }
 
 // A write resolves when the transaction is sent, not confirmed, so every action waits for the receipt.

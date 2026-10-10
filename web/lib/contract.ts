@@ -38,12 +38,22 @@ export const erc20Abi = parseAbi([
   "function approve(address spender, uint256 amount) returns (bool)",
 ]);
 
+/** The ERC-4626 views the review screens read. Shares use the vault's own decimals, so never assume 18. */
+export const vaultAbi = parseAbi([
+  "function decimals() view returns (uint8)",
+  "function previewDeposit(uint256 assets) view returns (uint256)",
+  "function previewWithdraw(uint256 assets) view returns (uint256)",
+]);
+
 export const KINDS = ["Anytime", "Goal"] as const;
 export const TIERS = ["Calm", "Steady", "Bold"] as const;
 export const TIER_KEYS = ["calm", "steady", "bold"] as const;
 
 export const KIND_ANYTIME = 0;
 export const KIND_GOAL = 1;
+
+/** Longest pot name the contract accepts, in bytes. */
+export const MAX_NAME_BYTES = 64;
 
 /** Shown until the backend supplies the name the owner chose. */
 export const fallbackPotName = (kind: number, id: bigint) =>
