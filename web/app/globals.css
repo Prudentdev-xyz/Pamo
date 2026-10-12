@@ -1,1 +1,43 @@
 @import "tailwindcss";
+
+@theme {
+  --color-white: #FFFFFF;
+  --color-black: #0A0A0A;
+
+  --color-green: #0B7A4B;
+  --color-green-pressed: #096640;
+  --color-green-bright: #3DDC84;
+  --color-mint: #E6F4EC;
+
+  --color-grey-text: #5A655E;
+  --color-grey-text-dark: #A3ADA6;
+  --color-grey-muted: #8A948D;
+  --color-grey-line: #DCE2DD;
+  --color-grey-surface: #F5F7F5;
+
+  --color-error: #B3261E;
+  --color-error-fill: #FCEBE9;
+  --color-caution: #8A5A00;
+  --color-caution-fill: #FFF4DC;
+
+  --font-sans: var(--font-be-vietnam-pro), "Be Vietnam Pro", system-ui, sans-serif;
+
+  --spacing: 4px;   /* p-4 = 16px */
+
+  --radius-sm: 8px;      /* chips, inputs */
+  --radius-card: 16px;
+  --radius-sheet: 24px;  /* buttons are fully round: rounded-full */
+
+  --shadow-sheet: 0 8px 32px rgb(10 10 10 / 0.10);  /* sheets and modals only */
+
+  --text-caption: 12px;  --text-caption--line-height: 16px;
+  --text-label: 14px;    --text-label--line-height: 20px;
+  --text-body: 16px;     --text-body--line-height: 24px;
+  --text-h3: 20px;       --text-h3--line-height: 28px;
+  --text-h2: 24px;       --text-h2--line-height: 32px;
+  --text-h1: 32px;       --text-h1--line-height: 40px;
+  --text-display: 40px;  --text-display--line-height: 48px;
+  --text-balance: 48px;  --text-balance--line-height: 56px;
+
+  --breakpoint-desktop: 1440px;  /* phone first, base width 390 */
+}
