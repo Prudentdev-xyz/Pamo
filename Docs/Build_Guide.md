@@ -175,10 +175,10 @@ Run with `arc-forge test --network arc`. Plain Foundry cannot move USDC on an Ar
 
 - [x] Run **Slither** (`slither . --filter-paths "lib|test|script"`) and fix any reentrancy, unchecked-return or unprotected-function findings. Result: no high or medium findings. Three accepted notes: state is written after `vault.deposit` (the share count comes from its return value; every state-changing function is `nonReentrant`), `getPots` calls the vault in a loop (view only), and unlock dates compare `block.timestamp` (day-scale).
 - [x] Fuzz runs at 10,000 (`FOUNDRY_PROFILE=deep arc-forge test --network arc`).
-- [ ] Approvals are **exact amounts only**, in the contract (`forceApprove(vault, assets)`, done and tested) and in the frontend (never `type(uint256).max`).
+- [x] Approvals are **exact amounts only**, in the contract (`forceApprove(vault, assets)`, done and tested) and in the frontend (never `type(uint256).max`). Result: the web app has one approve call, `allowUsdc` in `web/lib/tx.ts`, and it approves the amount being saved.
 - [x] CEI order + `nonReentrant` on every function that calls the vault (withdrawals update state before calling the vault).
-- [ ] **Admin key:** `pause` and `setTierVault` sit with one key. ethskills flags a single key as a censorship risk. Pause only blocks new deposits (withdrawals always work), which limits it; still, move ownership to a multisig (e.g. Safe, if deployed on Arc) or add a timelock on `setTierVault` when possible, and say so in the README.
-- [ ] Source verified on the explorer right after deploy.
+- [ ] **Admin key:** `pause` and `setTierVault` sit with one key. ethskills flags a single key as a censorship risk. Pause only blocks new deposits (withdrawals always work), which limits it; still, move ownership to a multisig (e.g. Safe, if deployed on Arc) or add a timelock on `setTierVault` when possible, and say so in the README. Checked Oct 12: Safe v1.4.1 is deployed on Arc mainnet and testnet (factory `0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67`, source verified on the mainnet explorer) and the Safe app lists both networks, so a multisig needs no contract change. `PamoSavings` is `Ownable2Step` and the deploy script takes `OWNER`, so the mainnet deploy can name the Safe as admin from the first block. Still to do at the mainnet deploy: create the Safe and deploy with `OWNER` set to it (decision in §10). The README says the admin is one key today.
+- [ ] Source verified on the explorer right after deploy. Testnet: done. Mainnet: the explorer is Blockscout too, so the verifier URL is `https://explorer.arc.io/api/` (answers #5). It sits behind Cloudflare and refused a plain `curl` with 403 while accepting a browser-style request, so `arc-forge verify-contract` may be refused; the fallback is to upload the standard JSON input on the explorer's verify page. The command is in `contracts/README.md`.
 
 ---
 
@@ -352,7 +352,8 @@ Motion is the library that used to be called Framer Motion. Install the `motion`
 
 | Where | Element | Library | What happens |
 |---|---|---|---|
-| Landing | Logo | anime.js | "Pamo" fades in, then the tone marks (the accent and the dot) settle into place |
+| Landing, phone width | Logo intro | anime.js | A full white screen with only the wordmark: "Pamo" writes in letter by letter, the tone marks (the accent and the dot) settle, then the wordmark travels up into the nav as the page is revealed. About 1.6 s, once per visit, any tap skips it |
+| Landing, desktop width | Logo | anime.js | No full-screen intro. In the nav, "Pamo" fades in, then the tone marks settle into place while the hero text rises |
 | Landing | Hero text + button | GSAP | Headline lines rise and fade in one after another; button appears last |
 | Landing | How it works | GSAP ScrollTrigger | As you scroll, a USDC dot travels wallet → Pamo → vault → back with interest |
 | Landing | Feature cards | GSAP ScrollTrigger | Cards rise in with a short stagger |
@@ -389,7 +390,7 @@ All icons come from **Iconsax** (`iconsax-react`), so the whole app shares one d
 - **Icons don't animate themselves:** Iconsax ships static SVGs. When an icon needs to move, wrap it in a Motion element (§7.3) and follow the same tokens and reduced-motion rules.
 - **Meaning never rests on an icon alone:** pair it with a text label, or give icon-only buttons an `aria-label`.
 - **Money truth first:** an animated number always ends on the exact value read from the chain.
-- **Budget:** landing hero under 1.2 s; in-app transitions at or under 250 ms.
+- **Budget:** landing hero under 1.2 s; the phone-width logo intro about 1.6 s before it; in-app transitions at or under 250 ms.
 
 ---
 
@@ -476,7 +477,7 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [ ] **#10** Test motion on a mid-range phone; trim or drop anime.js if janky
 - [ ] **Move to mainnet.** **#1** Get real USDC onto an Arc mainnet wallet (about 20–50 USDC); send 0.01 USDC to yourself
 - [ ] Re-check liquidity and confirm the three mainnet tier vaults (**#8**)
-- [ ] **#5** Find the mainnet verifier URL; **deploy `PamoSavings` to Arc mainnet** and verify the source
+- [ ] **#5** Find the mainnet verifier URL (found: `https://explorer.arc.io/api/`, see §4; not yet tried with `arc-forge`); **deploy `PamoSavings` to Arc mainnet** and verify the source
 - [ ] With `arc-cast` on mainnet: open a pot, deposit 1 USDC, withdraw it
 - [ ] Switch the env vars to mainnet (Arch §9): chain ID, RPC URL, contract address, Circle mainnet key
 - [ ] Deploy web to Vercel (env vars from Arch §9), pointing at mainnet and the hosted Express
@@ -514,6 +515,7 @@ At the end of each day, ask: *if I had to submit right now, what would I show?* 
 | Where review-screen quotes come from | Deposit: Earn Kit `getDepositQuote` when the wallet holds the amount, else the same fields from `/api/vaults`. Withdrawal: the Earn Kit cannot quote it (test #4), so Express builds it from the chain (`potValue`, `previewWithdraw`) and the vault's `liquidity` from `exploreVaults`; a direct ERC-4626 redeem carries no Circle withdrawal fee | Built this way in Phase 4 |
 | Early withdrawal from a Goal pot | Not in v1: the lock is the point | Built this way in Phase 4 |
 | Backend host | Render is live. Its free plan sleeps when idle (38.9 s cold start in test #9), which would also stop the indexer. A GitHub Actions job pings `/api/health` every 10 minutes to keep it awake (`.github/workflows/keep-awake.yml`). GitHub can run scheduled jobs late, so move to a paid instance if the server still sleeps; Railway was not timed | Chosen for the build, re-check before mainnet |
+| Admin key on mainnet | Deploy with `OWNER` set to a Safe on Arc, so `pause` and `setTierVault` need more than one signature. Needs the signer addresses and the threshold (2 of 3 is the usual choice). A timelock on `setTierVault` would mean changing and re-testing the contract, so it is left for after v1 | Open |
 | Keep anime.js | Keep unless phone test #10 shows jank | Open |
 | Logo tone-mark spelling | Pamọ́, plain black on white | ✅ Confirmed |
 | Brand colours | White first, black, Pamo green `#0B7A4B` (Brand_Design.md) | ✅ Confirmed |

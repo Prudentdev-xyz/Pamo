@@ -4,6 +4,7 @@ Prompts for getting Pamo's brand kit, design system and core screens out of Clau
 
 - **Companion docs:** [Brand_Design.md](Brand_Design.md) (the decisions these prompts carry) · [Build_Guide.md](Build_Guide.md) §6 and §7 (screens, copy rules, motion)
 - **If a value changes** in Brand_Design.md, change it in the brief below too. The brief is a copy, not the source.
+- **Full screens:** §5 has the prompts for the app screens, the logo intro and the landing page. They build on the brief (§1) and the design system from step 4.
 
 ---
 
@@ -288,3 +289,206 @@ Short corrections for the mistakes design tools make most often.
 | 2. Logo chosen | Brand_Design.md §6; save the SVGs into the web app's public folder |
 | 4. Spacing, radii, type scale | Brand_Design.md §8 token block |
 | 7. Handoff | Build Guide checklist: "Tailwind theme tokens" and "Apply the brand to every screen" |
+
+---
+
+## 5. UI screen prompts
+
+Prompts for the full screens: the app shell, every journey, the logo intro and the landing page. They were written against Brand_Design.md, Build Guide §6 and §7, and the new-pot flow in Architecture §8.2.
+
+### 5.1 References
+
+Five websites and two screenshots were studied for layout and motion. The prompts describe these patterns in words and never name the sites, so the tool builds Pamo's own version and not a copy.
+
+| Reference | What is worth borrowing | What stays out |
+|---|---|---|
+| arcle.xyz | A phone pinned in the centre while you scroll, with its screen changing per section; headline left, short text and button right; big rounded cards with one huge number each | The lime colour blocks and the chat product |
+| ihejierejeremiah.com | A short intro screen before the site, then the page revealed with a curved wipe; smooth scrolling | The percentage counter and the typewriter headline |
+| fredyomoke.xyz | Very large, tight headings; the circle-arrow button; the full-screen phone menu with big words (from the screenshot) | The dark page mode |
+| rugged-hawk-cxt.modulify.website | A floating pill-shaped nav; the product shown inside a phone, large | Glows, gradients and the wordmark hidden behind the phone |
+| jitter.video | Lots of white, one bold headline, one button; a nav that shrinks to two buttons once you scroll | The purple and the template gallery |
+| The Orbit dashboard (screenshot) | Sidebar, greeting, small stat cards, one chart card with one highlighted bar, a short list under the nav | Dark theme and the orange |
+
+### 5.2 How to use these
+
+- Work in the same Claude Design project that holds the design system. In a new project, paste the brief from §1 first.
+- Paste the UI brief (§5.3), then prompt 1. Approve prompt 1 before sending the rest, because it fixes the navigation and the overall feel.
+- Run prompts 2 to 5 one at a time. Each one is a complete journey, so the user flow stays intact.
+- The fix-up prompts in §3 still apply.
+
+Why five prompts and not one: one request for every screen gives shallow screens and skipped states, and a wrong direction cannot be corrected early. One prompt per screen lets the screens drift apart and loses the flow between them.
+
+### 5.3 UI brief (paste first)
+
+````text
+We are now designing Pamo's full screens. Keep following the brand brief and the design system already in this project: same colours, Be Vietnam Pro, same components, same copy rules, same sample content. Do not design yet; reply with a short summary and any questions.
+
+# WHAT THIS IS
+Pamo is a responsive website, opened in a browser on a laptop or in a phone browser. It is not a native iOS or Android app. So: no status bar with a clock and battery, no home indicator, no app-store framing, and no device frame drawn around the screens. Show each screen as a plain browser page at the stated width.
+
+# WHAT I WANT
+Screens that feel finished and alive: confident type, generous white space, and motion that explains what just happened. Calm and certain, never flashy.
+
+# ORIGINALITY
+I will describe layout and motion patterns I like. Use them as principles only. Do not reproduce any existing website or app: no borrowed layouts pixel for pixel, no borrowed copy, illustrations, icons or colours. Everything must come from Pamo's own design system.
+
+# PATTERNS I LIKE (in words)
+- Type: very large, tight headings beside small calm body text. One idea per section.
+- Navigation on desktop: a floating pill-shaped bar on the public pages; a left sidebar inside the app.
+- Navigation on phones: a full-screen menu on black, white words at heading size stacked down the left, a small plus mark at the right of each row, a close button top right.
+- A phone frame pinned in the middle of the page while the visitor scrolls; the screen inside the phone changes to match each section. Heading on the left, two lines of text and one button on the right.
+- Big rounded cards that each carry one very large figure and one short line.
+- A circle-with-arrow mark inside secondary buttons.
+- The nav shrinks to its two main buttons once the page is scrolled.
+
+# LAYOUT
+- Two widths of the same website: a phone browser at 390 wide and a desktop browser at 1440. Design the 390 width first. Show both for every screen.
+- White backgrounds. Black is for moments only: the phone menu, one landing section, the footer. No dark mode.
+- One green button per screen.
+
+# USER FLOW (do not change the order)
+Landing -> Connect wallet -> Dashboard -> New pot (choose Anytime or Goal -> Goal only: name, target, unlock date -> pick a tier -> amount -> review -> Allow -> Save -> success) -> Pot detail -> Add money or Withdraw (review first) -> back to Dashboard.
+Portfolios and the Growth Calculator are open without a wallet.
+Every screen shows where the person is, what the one next action is, and a way back. Going back keeps what was typed.
+
+# MOTION (design room for it and annotate it)
+- Timings: 150 ms for hover and press, 250 ms for page and step changes, 600 ms for progress bars and number count-ups.
+- Movement uses position and opacity only. Nothing blocks a click. Numbers always end on the exact value.
+- With reduced motion on, only opacity changes.
+- For each screen, add a short "Motion notes" list: what moves, when, and for how long.
+
+# HONEST DATA
+Charts and figures may only show what Pamo really has: pot values, money put in, earned amounts, activity (saves and withdrawals with dates), each tier's live rate, each tier's rate history, and a vault's available cash. No invented history.
+````
+
+### 5.4 Prompt 1: app shell and dashboard
+
+````text
+Prompt 1: the app shell and the dashboard.
+
+APP SHELL
+- Desktop: a left sidebar about 260 wide on white with a grey-line border. Top: the Pamọ́ wordmark. Then nav rows with icon and label: Dashboard, Portfolios, Calculator. Below, a section titled "Your pots" listing each pot by name with its tier level mark; the current pot is highlighted in mint. At the bottom: the wallet address chip with a Disconnect option, and "Arc" as the network.
+- Phone: a top bar with the wordmark and a menu button. The menu opens full screen on black with large white words (Dashboard, Portfolios, Calculator, New pot) and the wallet chip at the bottom.
+- Show the three guard states inside the shell: wallet not connected ("Connect wallet"), wrong network ("Pamo runs on Arc" with a "Switch to Arc" button), and a slim banner "Live rates unavailable. Saving and withdrawing still work."
+
+DASHBOARD
+- A greeting line ("Good morning") with the date beside it. No names; the wallet chip identifies the person.
+- Row of three stat cards: Total saved (the biggest figure on the screen), Earned so far (green), and Pots (count, with how many are goals). Each card has one small caption line under the figure.
+- A second row of three slim cards: Calm, Steady and Bold with today's APY and "changes daily".
+- One chart card: "Put in by month" as bars built from the activity history, the current month in Pamo green and the rest in grey line, with a small value label on the highlighted bar.
+- Pot cards: name, kind badge, tier chip, value, earned. Goal pots add the progress bar and "unlocks Mar 1, 2027".
+- Recent activity list, five rows, with "See all".
+- Actions: "New Anytime Vault" (green) and "New Goal" (outline).
+- Empty state for a new wallet: "Nothing saved yet. Start with any amount." with the same two actions.
+
+Deliver: dashboard with pots, dashboard empty, the three guard states, the open phone menu. Phone and desktop for each. Motion notes: stat figures count up, pot cards arrive one after another, progress bars fill.
+````
+
+### 5.5 Prompt 2: the saving journey
+
+````text
+Prompt 2: creating a pot and saving, as one continuous flow. Use the shell from prompt 1.
+
+Steps, in this order, with a progress indicator and a Back that keeps the values:
+1. Choose the kind: Anytime Vault ("Take it out whenever you want") or Goal Vault ("Locked until you reach your target or your date").
+2. Goal only: name (up to 64 characters, note that names are public), target amount in USDC, unlock date.
+3. Pick a tier: Calm, Steady, Bold as three cards with the level mark, today's APY, one plain line on risk, and the cash available in that vault.
+4. Amount: a large amount field with "USDC", the wallet balance and a Max link. Not enough USDC shows the balance and how to get USDC on Arc.
+5. Review your saving: rows for You save, Into (tier and vault name), APY today (changes daily), Vault fees, You receive (shares and share price), Network fee, In 1 year (estimate, not a promise). Any warning sits above the button.
+6. Two signing steps shown as "Step 1 of 2: Allow Pamo to use your USDC" then "Step 2 of 2: Save". Only one is active at a time. Each has its own pending state with a link to the explorer.
+7. Success: the one screen allowed a large green area. A check mark, "Saved", the amount, and "View pot".
+
+Also show: wallet rejected ("Cancelled. Nothing was moved."), deposits paused, and the review while the network fee reads "Available after allowing".
+
+At the phone width the review is a sheet that rises from the bottom of the page; on desktop it is a centred panel. Phone and desktop for every step. Motion notes: steps slide in the direction of travel, the selection outline glides between tier cards, the sheet rises, step 1 ticks off before step 2 wakes, the check mark draws itself and the balance counts up.
+````
+
+### 5.6 Prompt 3: the pot journey
+
+````text
+Prompt 3: living with a pot. Use the shell from prompt 1.
+
+POT DETAIL
+- Header: pot name, kind badge, tier chip. The value as the biggest figure, then "Put in" and "Earned" (green).
+- Goal pots: progress bar, "70% of goal", and the lock line "Unlocks when you reach 1,200.00 USDC or on Mar 1, 2027".
+- A details block: tier, vault name with an explorer link, APY today (changes daily).
+- A small line chart of this tier's rate history, labelled as the rate, not as earnings.
+- Activity for this pot: Saved and Withdrew rows with date, amount and an explorer link.
+- Actions: "Add money" (green) and "Withdraw" (outline).
+
+ADD MONEY: the amount step and review from prompt 2, reused.
+
+WITHDRAW
+- Amount field with "Available now" and Max.
+- Review your withdrawal: You withdraw, Shares redeemed, Withdrawal fee, Available now in this vault, Left in this pot, Network fee. One "Withdraw" button.
+- Success state with the new pot value.
+
+Also show: a locked goal (Withdraw disabled with the reason beside it), the vault short on cash ("The vault is short on cash right now. Try up to 500.00 USDC." with the button disabled), an empty pot after withdrawing everything, and the backend-down version where activity cannot load.
+
+Phone and desktop for each. Motion notes: value counts from old to new after a transaction, the progress bar springs to the new percentage, errors fade in.
+````
+
+### 5.7 Prompt 4: Portfolios and the Growth Calculator
+
+````text
+Prompt 4: the two pages that work without a wallet. They use the public floating nav, not the app sidebar, with a "Start saving" button.
+
+PORTFOLIOS
+- A short heading and one line: these are USDC lending vaults, never stocks or funds.
+- Calm, Steady and Bold side by side on desktop, stacked on phones. Each card: level mark, today's APY with "changes daily", who runs the vault, cash available now, one plain line on risk, a small rate-history line, and "Save in Calm".
+- States: rates loading, and "Live rates unavailable right now".
+
+GROWTH CALCULATOR
+- Inputs: starting amount, monthly top-up, months as a slider from 1 to 36, and a tier picker.
+- Result: projected balance as the biggest figure, then total put in and estimated interest (green), and a growth curve.
+- Caption under the result: "Estimate at today's rate. Not a promise."
+- One action: "Start this pot".
+
+Phone and desktop for each. Motion notes: the result counts to its new value as inputs change, the curve draws once on first view, a slow pulse on the live-rate dot.
+````
+
+### 5.8 Prompt 5: logo intro and landing page
+
+````text
+Prompt 5: the logo intro and the landing page.
+
+LOGO INTRO (when the website first loads; it differs by width)
+
+At the phone width (390): a short full-screen intro.
+- A full white screen with nothing on it but the wordmark, centred, in black.
+- "Pamo" writes in letter by letter, then the dot below and the accent above the last letter settle into place to complete "Pamọ́". A short hold.
+- The wordmark then travels up into its place in the nav while the page is revealed beneath with a soft curved wipe.
+- About 1.6 seconds in all.
+- Deliver it as a storyboard of five frames with timings, plus a playable version.
+
+At the desktop width (1440): no full-screen intro. Nothing covers the page.
+- The wordmark animates where it already sits in the nav: "Pamo" appears, then the dot and the accent settle.
+- The hero heading rises at the same time. Everything is finished within 1.2 seconds.
+- Deliver it as three frames with timings, plus a playable version.
+
+At both widths: it plays once per visit, any tap or key skips it, and with reduced motion on it is a simple fade.
+
+LANDING PAGE
+1. Nav: a floating pill bar with the wordmark, How it works, Tiers, Calculator, and "Start saving". After scrolling it shrinks to "Start saving" and a menu button.
+2. Hero on white: heading "Keep it safe." at the largest size, the line "Your USDC savings earn while they sit.", a green "Start saving" and an outline "See the tiers", and under them today's live rate, labelled "changes daily".
+3. How it works: a phone frame pinned in the centre while the visitor scrolls through four beats. The heading sits left, two lines and one link sit right, and the phone screen changes with each beat: your wallet -> a pot in Pamo -> the lending vault -> interest back in your pot. Use real Pamo screens inside the phone. This is the one place a phone outline is drawn, as an illustration of the site in a phone browser; keep it a plain outline with no status bar.
+4. What you can do: three big rounded cards, each with one very large figure or mark and one short line: Anytime Vault, Goal Vault, Pamo Portfolios. This is the one section on black; use bright green for figures there.
+5. Calculator teaser on white: an example balance with "Estimate at today's rate. Not a promise." and "Try the calculator".
+6. Why trust it: three short facts in plain words. Only you can withdraw. Withdrawals work even when new savings are paused. The contract is public on Arc.
+7. The name: one line on the Yoruba "fi pamọ́", "keep it safe".
+8. Footer on black: "Live on Arc", the contract address linked to the explorer, a GitHub link.
+
+Phone and desktop. At the phone width the pinned phone becomes four stacked beats. Motion notes: hero lines rise one after another with the button last, the pinned-phone timing per beat, cards rising with a short stagger, the teaser balance counting up when it enters view.
+````
+
+### 5.9 Where these prompts differ from the other docs
+
+Each of these is a choice made in the prompts and not yet carried into the other docs. Confirm or change it before the screens are built.
+
+| Difference | In the prompts | In the other docs |
+|---|---|---|
+| Mockup framing | Plain browser pages, no device frame or status bar | `Pamo Mockups/01-app-screens.png` draws the screens inside a phone with a status bar |
+| Dashboard chart | "Put in by month", drawn from the activity the indexer already stores | Not in the v1 dashboard (Build Guide §6, screen 2). Drop that line from prompt 1 to stay on spec |
+| Chart on the pot screen | The tier's rate history | The mockup shows "Earned in this pot" over time, which Pamo does not store |
+| Dashboard and landing content | A greeting, a pot-count card and a "Why trust it" landing section; buttons "New Anytime Vault" and "New Goal" | The mockup has "Add money" and "New pot"; the guide has no greeting, pot count or trust section |
+| Black areas | The phone menu, one landing section and the footer | Brand_Design.md §3 names a dark footer or one dark landing section; the fix-up prompt in §3 says only the footer |

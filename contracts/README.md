@@ -18,4 +18,8 @@ arc-forge verify-contract <address> src/PamoSavings.sol:PamoSavings \
   --constructor-args $(arc-cast abi-encode "constructor(address,address,address,address)" <owner> <calm> <steady> <bold>) --watch
 ```
 
+On mainnet the chain ID is `5042`, the RPC alias is `arc_mainnet` and the verifier URL is `https://explorer.arc.io/api/`. That explorer sits behind Cloudflare; if `verify-contract` is refused, upload the standard JSON input on the explorer's verify page.
+
+The admin can pause new deposits and set which vault a tier uses. To make it a multisig, create a Safe on Arc at [app.safe.global](https://app.safe.global) and set `OWNER` to its address before deploying. To move an existing deployment, the current owner calls `transferOwnership(<safe>)` and the Safe then calls `acceptOwnership()`.
+
 Copy `.env.example` to `.env` for the deployer key. See [Docs/Build_Guide.md](../Docs/Build_Guide.md) §4 for the contract and its test list.

@@ -115,7 +115,7 @@ The tier chip is the name and the mark on a mint fill. The name is always shown,
 - **On black:** the same wordmark in white.
 - **Never** set the wordmark in green, place it on a photo, or put it in a coloured box.
 - **Clear space:** keep at least the height of the letter "a" free on every side.
-- **Motion:** on the landing page, "Pamo" fades in and the tone marks settle into place (Build Guide §7.3).
+- **Motion:** on the landing page, "Pamo" appears and the tone marks settle into place. At phone width this is a short full-screen intro; on desktop it happens in the nav (Build Guide §7.3).
 - **Files:** `Brand Kit & Design/Pamo Logos/export/brand-assets/` has the wordmark, the compact mark and a cover image as 1080 px PNGs. There is no SVG yet; the web app needs an SVG wordmark with the text converted to outlines, so the ọ́ cannot break if a font fails to load.
 - The exports include green-on-white and black-on-green versions. The rules above rule those out, so use only black on white and white on black.
 

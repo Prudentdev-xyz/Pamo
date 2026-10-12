@@ -60,7 +60,7 @@ Pamo makes it simple: save any amount, set goals, and earn live lending yield on
 
 ## Product rules
 
-1. **Non-custodial.** Only the pot owner can withdraw. The admin can set which vault a tier uses for new pots and pause new deposits, but cannot withdraw, move or freeze user funds. Withdrawals work even when paused.
+1. **Non-custodial.** Only the pot owner can withdraw. The admin can set which vault a tier uses for new pots and pause new deposits, but cannot withdraw, move or freeze user funds. Withdrawals work even when paused. On testnet the admin is a single key. The contract uses two-step ownership, and Safe is deployed on Arc, so the admin can be a multisig.
 2. **Honest numbers.** Rates are live and labelled as today's rate. The calculator is always an estimate, never a promise.
 3. **No surprises.** Every save and withdrawal goes through a review screen first.
 4. **Plain language.** "Lending vault", "earned", "unlocks on". No jargon without an explanation.
