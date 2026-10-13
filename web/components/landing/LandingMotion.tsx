@@ -8,9 +8,9 @@ const all = <T extends Element>(selector: string) => [...document.querySelectorA
 
 /**
  * The landing page's motion (Build Guide §7.3). It draws nothing itself.
- * - Logo intro, anime.js: at phone width a white screen where "Pamo" writes in, the tone marks settle and the
- *   wordmark travels up into the nav. At desktop width the same letters and marks arrive in the nav. Once per visit.
- * - Hero lines and feature cards, GSAP: loaded here with a dynamic import, so GSAP is only ever fetched on `/`.
+ * - Logo intro, anime.js: a white screen where "Pamo" writes in, the tone marks settle and the wordmark travels
+ *   up into the nav. Once per visit, at every width.
+ * - Hero lines, feature cards and the text of the sections below, GSAP: loaded here with a dynamic import, so GSAP is only ever fetched on `/`.
  * With reduced motion on, none of it runs and everything is in place.
  */
 export function LandingMotion() {
@@ -35,7 +35,7 @@ export function LandingMotion() {
     const timers: number[] = [];
     let revertGsap = () => {};
 
-    // Hero lines rise one after another with the buttons last; the cards rise when their section arrives.
+    // Hero lines rise one after another with the buttons last; the cards and the sections' text rise as they arrive.
     let heroStarted = false;
     const startHero = () => {
       if (heroStarted || !moving) return;
@@ -63,6 +63,17 @@ export function LandingMotion() {
               scrollTrigger: { trigger: "[data-cards]", start: "top 80%", once: true },
             },
           );
+          // Titles and text further down: whatever comes into view together rises together, one after another.
+          ScrollTrigger.batch('[data-rise="text"]', {
+            start: "top 88%",
+            once: true,
+            onEnter: (seen) =>
+              gsap.fromTo(
+                seen,
+                { y: 24, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.6, stagger: 0.08, ease: "power3.out", clearProps: "transform" },
+              ),
+          });
         });
         revertGsap = () => context.revert();
       })().catch(() => {
@@ -106,7 +117,7 @@ export function LandingMotion() {
     if (!playIntro) {
       startHero();
     } else if (fullScreen) {
-      // Phone: about 1.6 s in all. Any tap or key skips it.
+      // About 1.6 s in all. Any tap or key skips it.
       root.style.overflow = "hidden";
       window.scrollTo(0, 0);
       window.addEventListener("pointerdown", finishIntro);
@@ -134,7 +145,7 @@ export function LandingMotion() {
         }, 1150),
       );
     } else {
-      // Desktop: no full screen. The wordmark arrives in the nav while the hero rises.
+      // The intro's screen is not there to play on: the wordmark arrives in the nav while the hero rises.
       writeIn("[data-nav-logo]", 90);
       startHero();
       timers.push(window.setTimeout(finishIntro, 900));

@@ -75,10 +75,10 @@ export default function Home() {
         <section aria-labelledby="do-title" className="bg-black px-5 py-18 text-white lg:px-20 lg:py-32">
           <div className="mx-auto grid max-w-320 gap-8 lg:gap-14">
             <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
-              <h2 id="do-title" className={sectionTitle}>
+              <h2 id="do-title" data-rise="text" className={sectionTitle}>
                 What you can do
               </h2>
-              <p className="max-w-95 text-body text-grey-text-dark">Two kinds of pot and three portfolios. All of it in USDC.</p>
+              <p data-rise="text" className="max-w-95 text-body text-grey-text-dark">Two kinds of pot and three portfolios. All of it in USDC.</p>
             </div>
             <ul data-cards className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-3">
               {CARDS.map((card) => (
@@ -104,14 +104,14 @@ export default function Home() {
         <section aria-labelledby="grow-title" className="px-5 py-18 lg:px-20 lg:py-32">
           <div className="mx-auto grid max-w-320 gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-center lg:gap-14">
             <div className="grid gap-4">
-              <h2 id="grow-title" className={sectionTitle}>
+              <h2 id="grow-title" data-rise="text" className={sectionTitle}>
                 See it grow.
               </h2>
-              <p className="max-w-105 text-body text-grey-text">
+              <p data-rise="text" className="max-w-105 text-body text-grey-text">
                 Put in a starting amount and a monthly top-up, pick a portfolio, and see an estimate.
               </p>
             </div>
-            <div className="grid gap-5 rounded-sheet border border-grey-line p-7 lg:p-10">
+            <div data-rise="text" className="grid gap-5 rounded-sheet border border-grey-line p-7 lg:p-10">
               <TeaserBalance />
               <Link href="/calculator" className={`${arrowLink} justify-self-start`}>
                 Try the calculator
@@ -125,12 +125,12 @@ export default function Home() {
 
         <section aria-labelledby="trust-title" className="px-5 pb-18 lg:px-20 lg:pb-32">
           <div className="mx-auto grid max-w-320 gap-8 border-t border-grey-line pt-14 lg:gap-14 lg:pt-24">
-            <h2 id="trust-title" className={sectionTitle}>
+            <h2 id="trust-title" data-rise="text" className={sectionTitle}>
               Why trust it
             </h2>
             <ol className="grid grid-cols-[minmax(0,1fr)] gap-8 lg:grid-cols-3 lg:gap-12">
               {FACTS.map((fact, i) => (
-                <li key={fact.title} className="grid content-start gap-2.5">
+                <li key={fact.title} data-rise="text" className="grid content-start gap-2.5">
                   <span aria-hidden="true" className="text-label font-bold text-grey-text tabular-nums">
                     0{i + 1}
                   </span>
@@ -143,6 +143,7 @@ export default function Home() {
               href={explorerAddress(PAMO_SAVINGS)}
               target="_blank"
               rel="noreferrer"
+              data-rise="text"
               className="inline-flex items-center gap-1.5 justify-self-start text-label font-semibold text-green underline hover:text-green-pressed"
             >
               View contract on explorer
@@ -152,7 +153,7 @@ export default function Home() {
         </section>
 
         <section aria-label="The name" className="px-5 pt-6 pb-22 lg:px-20 lg:pt-10 lg:pb-36">
-          <p className="mx-auto max-w-275 text-h2 tracking-[-0.02em] lg:text-display">
+          <p data-rise="text" className="mx-auto max-w-275 text-h2 tracking-[-0.02em] lg:text-display">
             Pamo comes from the Yoruba <i lang="yo">fi pamọ́</i>: <b className="font-bold">keep it safe.</b>
           </p>
         </section>
@@ -160,12 +161,12 @@ export default function Home() {
 
       <SiteFooter />
 
-      {/* The logo intro's screen: phones only, once per visit. LandingMotion plays it. */}
-      <div data-intro-screen aria-hidden="true" className="fixed inset-0 z-50 lg:hidden motion-reduce:hidden">
+      {/* The logo intro's screen, once per visit. LandingMotion plays it. */}
+      <div data-intro-screen aria-hidden="true" className="fixed inset-0 z-50 motion-reduce:hidden">
         <div data-intro-wipe className="absolute inset-x-0 top-0 h-[calc(100%+200px)] rounded-b-[50%_200px] bg-white" />
         <div className="absolute inset-0 flex items-center justify-center">
           <div data-intro-mark className="origin-top-left text-black">
-            <Logo className="h-16 w-auto [&_[data-logo]]:opacity-0" />
+            <Logo className="h-16 w-auto lg:h-24 [&_[data-logo]]:opacity-0" />
           </div>
         </div>
       </div>
