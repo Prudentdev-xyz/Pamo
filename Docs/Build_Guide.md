@@ -487,7 +487,7 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 ### Phase 7: Story (Oct 13)
 
 - [ ] README: what Pamo is, live URL, contract address + explorer link, architecture diagram (from Arch §2), how to run, roadmap
-- [ ] Redraw `pamo-pseudocode.png` first (it shows an older design: tier per user, `apy / 12`), then add it to the README
+- [x] Redraw `pamo-pseudocode.png` first (it shows an older design: tier per user, `apy / 12`), then add it to the README
 - [ ] Record a 2–3 minute demo video: problem → save → goal → calculator → explorer proof
 - [ ] Draft the DoraHacks submission; attach `Brand Kit & Design/Pamo_Spec_Arc.pdf`
 

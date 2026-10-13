@@ -184,6 +184,10 @@ Pamo makes it simple: save any amount, set goals, and earn live lending yield, w
 3. **No surprises.** Every save and withdrawal goes through a review screen first.
 4. **Plain language.** "Lending vault", "earned", "unlocks on". No jargon without an explanation.
 
+### Pamo on one page
+
+![Pamo pseudocode: how USDC moves from a pot owner through PamoSavings into a lending vault, and what the Anytime Vault, Goal Vault, Portfolios and Growth Calculator do](pamo-pseudocode.png)
+
 ---
 
 ## 2. Who are the actors?
