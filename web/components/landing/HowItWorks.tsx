@@ -163,19 +163,28 @@ function BeatLink({ beat }: { beat: number }) {
 const device = "relative shrink-0 overflow-hidden rounded-[2.75rem] border-8 border-black bg-white";
 // Every layer sits in the same grid cell, so the block is as tall as its tallest one and nothing jumps on a swap.
 const stack = "grid [&>*]:col-start-1 [&>*]:row-start-1";
-const layer = (active: boolean, before: boolean) =>
-  `transition-[opacity,transform] duration-250 ease-out ${active ? "" : `pointer-events-none opacity-0 ${before ? "-translate-y-4" : "translate-y-4"}`}`;
+// The old beat leaves quickly and the new one travels in after it, so the swap reads as a change and the two never sit on top of each other.
+// `far` is for the phone's screens, which slide like pages; the text moves a shorter way.
+const layer = (active: boolean, before: boolean, far = false) => {
+  if (active) return "transition-[opacity,transform] delay-150 duration-500 ease-out";
+  const away = far ? (before ? "-translate-y-1/3" : "translate-y-1/3") : before ? "-translate-y-8" : "translate-y-8";
+  return `pointer-events-none opacity-0 transition-[opacity,transform] duration-150 ease-out ${away}`;
+};
 
 /**
  * Wallet → Pamo → lending vault → interest back. Once GSAP has loaded the section pins for four beats of scroll,
- * and a USDC dot travels along the strip as you go. With reduced motion on, or before the script arrives,
+ * and a USDC dot travels along the strip as you go, filling the line behind it. With reduced motion on, or before the script arrives,
  * the four beats are simply stacked.
  */
 export function HowItWorks() {
   const section = useRef<HTMLElement>(null);
   const dot = useRef<HTMLSpanElement>(null);
+  const fill = useRef<HTMLSpanElement>(null);
+  const hint = useRef<HTMLSpanElement>(null);
   const [pinned, setPinned] = useState(false);
   const [beat, setBeat] = useState(0);
+  // The last stop the dot has got to. A stop turns black when the dot arrives, not before.
+  const [reached, setReached] = useState(0);
 
   // GSAP is loaded here, on the landing page only, so it never reaches the app's bundle.
   useEffect(() => {
@@ -192,8 +201,19 @@ export function HowItWorks() {
         if (gone || !section.current) return;
         const context = gsap.context(() => {
           const trigger = { trigger: section.current, start: "top top", end: "bottom bottom" };
-          ScrollTrigger.create({ ...trigger, onUpdate: (self) => setBeat(Math.min(3, Math.floor(self.progress * 4))) });
-          gsap.fromTo(dot.current, { xPercent: 0 }, { xPercent: 100, ease: "none", scrollTrigger: { ...trigger, scrub: 0.4 } });
+          // The scroll has four equal beats but the strip has three gaps. The dot sits on a stop in the middle of
+          // that stop's beat and is halfway to the next one when the beat changes.
+          const along = (p: number) => Math.min(1, Math.max(0, (p - 0.125) / 0.75));
+          ScrollTrigger.create({
+            ...trigger,
+            onUpdate: (self) => {
+              setBeat(Math.min(3, Math.floor(self.progress * 4)));
+              setReached(Math.floor(along(self.progress) * 3 + 0.001));
+            },
+          });
+          gsap.fromTo(dot.current, { xPercent: 0 }, { xPercent: 100, ease: along, scrollTrigger: { ...trigger, scrub: 0.4 } });
+          gsap.fromTo(fill.current, { scaleX: 0 }, { scaleX: 1, ease: along, scrollTrigger: { ...trigger, scrub: 0.4 } });
+          gsap.to(hint.current, { y: 5, duration: 0.6, ease: "sine.inOut", repeat: -1, yoyo: true });
         }, section);
         ScrollTrigger.refresh();
         // A link to this section landed before the layout changed, so line it up again.
@@ -211,11 +231,13 @@ export function HowItWorks() {
     <div className="grid gap-2.5">
       <div className="relative mx-1.5 h-3">
         <span className="absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-grey-line" />
+        {/* The part of the line the dot has already crossed. */}
+        {pinned && <span ref={fill} aria-hidden="true" className="absolute inset-x-0 top-1/2 h-0.5 origin-left -translate-y-1/2 scale-x-0 bg-black" />}
         <span className="absolute inset-0 flex items-center justify-between">
           {BEATS.map((b, i) => (
             <span
               key={b.stop}
-              className={`size-2 rounded-full transition-[background-color] duration-250 ease-out ${pinned && i > beat ? "bg-grey-line" : "bg-black"}`}
+              className={`size-2 rounded-full transition-[background-color] duration-250 ease-out ${pinned && i > reached ? "bg-grey-line" : "bg-black"}`}
             />
           ))}
         </span>
@@ -290,11 +312,21 @@ export function HowItWorks() {
                 </h3>
               ))}
             </div>
+            {/* Says the section moves with the scroll. It goes once the first beat has changed. */}
+            <p
+              aria-hidden="true"
+              className={`inline-flex items-center gap-2 text-label font-semibold text-black transition-opacity duration-250 ease-out ${beat === 0 ? "" : "opacity-0"}`}
+            >
+              <span ref={hint} className="flex size-7 items-center justify-center rounded-full bg-mint text-green">
+                <ArrowRightIcon size={14} className="rotate-90" />
+              </span>
+              Scroll to follow your USDC
+            </p>
           </div>
           <div aria-hidden="true" className={`${device} order-3 h-110 w-55 justify-self-center lg:order-none lg:h-145 lg:w-70`}>
             <div className={`${stack} origin-top-left [zoom:0.786] lg:[zoom:1]`}>
               {BEATS.map((b, i) => (
-                <div key={b.title} className={layer(i === beat, i < beat)}>
+                <div key={b.title} className={layer(i === beat, i < beat, true)}>
                   <Screen beat={i} />
                 </div>
               ))}
