@@ -2,6 +2,7 @@ import {
   Add,
   ArrowCircleRight,
   ArrowLeft,
+  ArrowRight,
   ArrowRight2,
   Calculator,
   Calendar1,
@@ -47,6 +48,7 @@ export const AddIcon = icon(Add);
 export const ArrowCircleIcon = icon(ArrowCircleRight);
 export const ChevronRightIcon = icon(ArrowRight2);
 export const BackIcon = icon(ArrowLeft);
+export const ArrowRightIcon = icon(ArrowRight);
 export const CalendarIcon = icon(Calendar1);
 /** A Goal Vault: locked until its target or its date. */
 export const LockIcon = icon(Lock1);

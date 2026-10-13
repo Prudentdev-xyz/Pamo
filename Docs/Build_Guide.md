@@ -103,7 +103,7 @@ Pamo/
 | Motion | **Motion** ([motion.dev](https://motion.dev), npm `motion`) (UI) · **GSAP + ScrollTrigger** (landing) · **anime.js** (npm `animejs`) (number count-ups, logo tone marks) |
 | Icons | **Iconsax** (npm `iconsax-react`) |
 | Wallet + chain | wagmi + viem + TanStack Query, Arc as a custom chain |
-| Charts / validation | Recharts · zod |
+| Charts / validation | Hand-drawn SVG (no chart library) · zod |
 | Backend | Node.js + Express + TypeScript, viem for the indexer |
 | Yield data | `@circle-fin/earn-kit` on Express only (the API key is rejected in browsers) |
 | Database | Supabase (Postgres), server access only |
@@ -371,7 +371,7 @@ Motion is the library that used to be called Framer Motion. Install the `motion`
 | Any button | Pending transaction | Motion | Label swaps to a small spinner; width doesn't jump |
 | Success | Confirmation | Motion | A check mark draws itself (SVG path), then the new balance counts up (anime.js) |
 | Calculator | Result number | anime.js | Counts to the new value as inputs change (debounced) |
-| Calculator | Curve | Recharts | Built-in line animation on first draw; instant updates after that |
+| Calculator | Curve | Motion | The balance line draws in from the left on first view; instant updates after that |
 | Errors | Error message | Motion | Short fade in with a small shake on the field, `fast` |
 | Any screen | Icons that change state | Motion | Old icon fades out as the new one fades in (copy → tick, eye → eye-slash), `fast` |
 
@@ -449,7 +449,7 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [x] New pot stepper (state machine from Arch §8.2)
 - [x] Review screens for save and withdraw (§6) (real saves and real withdrawals, part and then all, went through their reviews on testnet)
 - [x] Portfolios page with live tier data and rate history (the history line fills in once snapshots are being stored)
-- [x] Growth Calculator with the Recharts curve (checked against the formula: 100 + 50 a month for 12 months at 4.20% gives 717.76)
+- [x] Growth Calculator with its curve, drawn as plain SVG (checked against the formula: 100 + 50 a month for 12 months at 4.20% gives 717.76)
 - [x] Pot detail with activity from Supabase
 
 > ✅ **Checkpoint 3: "All v1 features working."** Ugly but complete, backend included.
@@ -459,12 +459,12 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [x] Tailwind theme tokens: copy the `@theme` block from Brand_Design.md §8 (colours, font, spacing, radii, shadow, type scale)
 - [x] Load Be Vietnam Pro (400, 600, 700) with `next/font`
 - [x] Logo: the exports in `Brand Kit & Design/Pamo Logos/` are PNG only. Make an SVG wordmark with outlined text for the web app's public folder (`web/public/pamo-wordmark.svg` and `web/components/Logo.tsx`, outlined from Be Vietnam Pro Bold, with the dot and the accent as separate paths for the logo motion)
-- [ ] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet (done for the app shell, the dashboard, the new pot flow and the pot page; portfolios, calculator and landing follow)
+- [ ] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet (done for the app shell, the dashboard, the new pot flow, the pot page, portfolios and the calculator; the landing page follows)
 - [x] Install `motion`, `animejs`, `iconsax-react` in `web/`
 - [x] `web/motion/`: `tokens.ts`, Motion `variants.ts`, anime.js `countUp.ts`
 - [ ] Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3) (done: route transitions, pot cards, progress bars, live APY dot, stepper, tier `layoutId`, review sheet, button pending state, success check)
-- [ ] anime.js: total saved / earned count-ups, calculator result (done: total saved, earned and the tier rates on the dashboard, the amount on the success screen, and a pot's value counting from old to new)
-- [ ] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5) (wrapper done; applied to the app shell, the dashboard, the new pot flow and the pot page)
+- [x] anime.js: total saved / earned count-ups, calculator result (total saved, earned and the tier rates on the dashboard, the amount on the success screen, a pot's value counting from old to new, and the three calculator results counting to their new value once the inputs settle)
+- [ ] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5) (wrapper done; applied to the app shell, the dashboard, the new pot flow, the pot page, portfolios and the calculator)
 - [ ] Reduced-motion support in all three libraries (§7.4)
 - [ ] All error and empty states (§6)
 

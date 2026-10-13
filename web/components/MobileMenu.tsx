@@ -10,7 +10,12 @@ import { ChainStatus } from "./ChainStatus";
 import { ChevronRightIcon, CloseIcon } from "./Icon";
 import { Logo } from "./Logo";
 
-const ITEMS = [
+export interface MenuItem {
+  href: string;
+  label: string;
+}
+
+const APP_ITEMS: MenuItem[] = [
   { href: "/app", label: "Dashboard" },
   { href: "/portfolios", label: "Portfolios" },
   { href: "/calculator", label: "Calculator" },
@@ -25,6 +30,7 @@ export function MobileMenu({
   address,
   balance,
   onDisconnect,
+  items = APP_ITEMS,
 }: {
   open: boolean;
   onClose: () => void;
@@ -32,7 +38,9 @@ export function MobileMenu({
   address?: string;
   /** The wallet's USDC, when it is known. */
   balance?: bigint;
-  onDisconnect: () => void;
+  onDisconnect?: () => void;
+  /** The links to list. The app's own by default; the public pages pass theirs. */
+  items?: MenuItem[];
 }) {
   const closeButton = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
@@ -79,7 +87,7 @@ export function MobileMenu({
             </button>
           </div>
           <nav aria-label="Main" className="grid flex-1 content-start overflow-y-auto overscroll-contain px-4 pt-8">
-            {ITEMS.map((item, i) => {
+            {items.map((item, i) => {
               const here = pathname === item.href;
               return (
                 <motion.div

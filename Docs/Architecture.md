@@ -28,7 +28,7 @@ How Pamo is put together: the stack, the system parts, how data moves, how the a
 | **Icons** | Iconsax (npm `iconsax-react`) | One icon set for the whole app: `Linear` by default, `Bold` for active states |
 | **Wallet + chain** | wagmi + viem | Wallet connection, Arc as a custom chain, contract reads and writes, gas estimates |
 | **Data fetching** | TanStack Query (comes with wagmi) | Caching and refreshing chain and API data |
-| **Charts** | Recharts | Growth Calculator curve |
+| **Charts** | Plain SVG, no chart library | Growth Calculator curve and the rate-history lines |
 | **Validation** | zod | Validating API inputs and outputs on both sides |
 | **Backend runtime** | Node.js | Runs the API and the indexer |
 | **Backend framework** | Express | REST API: vaults, quotes, activity, health |

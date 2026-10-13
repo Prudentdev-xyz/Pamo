@@ -52,12 +52,17 @@ const GET_USDC = chain.testnet
   : { href: "https://docs.arc.io/arc-chain", label: "Read the Arc guide" };
 
 // The new pot flow as a state machine (Architecture §8.2): type → goal details → portfolio → amount → review → saved.
-export default function NewPot({ searchParams }: { searchParams: Promise<{ kind?: string | string[] }> }) {
-  const { kind } = use(searchParams);
+export default function NewPot({
+  searchParams,
+}: {
+  searchParams: Promise<{ kind?: string | string[]; tier?: string | string[] }>;
+}) {
+  const { kind, tier } = use(searchParams);
   const [state, dispatch] = useReducer(
     newPotReducer,
     kind === "goal" ? KIND_GOAL : kind === "anytime" ? KIND_ANYTIME : undefined,
-    initialNewPot,
+    // A link from the portfolios page or the calculator arrives with its portfolio already picked.
+    (startKind: number | undefined) => ({ ...initialNewPot(startKind), tier: Math.max(0, TIER_KEYS.indexOf(tier as (typeof TIER_KEYS)[number])) }),
   );
   const { address } = useConnection();
   const balance = useUsdcBalance();

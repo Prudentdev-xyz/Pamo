@@ -1,25 +1,68 @@
-import Link from "next/link";
-import { buttonClass } from "./Button";
-import { Logo } from "./Logo";
+"use client";
 
-/** The header on the pages that need no wallet. */
-export function SiteNav() {
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { buttonClass } from "./Button";
+import { MenuIcon } from "./Icon";
+import { Logo } from "./Logo";
+import { MobileMenu, type MenuItem } from "./MobileMenu";
+
+const LINKS: MenuItem[] = [
+  { href: "/portfolios", label: "Portfolios" },
+  { href: "/calculator", label: "Calculator" },
+];
+
+const MENU: MenuItem[] = [...LINKS, { href: "/app", label: "Start saving" }];
+
+/** The floating header on the pages that need no wallet. */
+export function SiteNav({
+  cta = "primary",
+}: {
+  /** One green button per screen: a page with its own green action asks for the outline here. */
+  cta?: "primary" | "outline";
+}) {
+  const pathname = usePathname();
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
-    <header className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b border-grey-line pb-4">
-      <Link href="/" className="text-black">
-        <Logo className="h-7 w-auto" />
-      </Link>
-      <nav className="flex flex-wrap items-center gap-x-6 gap-y-2 text-label font-semibold">
-        <Link href="/portfolios" className="text-black hover:text-green">
-          Portfolios
+    <header className="sticky top-0 z-40 px-3 pt-[calc(0.5rem+env(safe-area-inset-top,0px))] pb-2 lg:px-10 lg:pt-5 lg:pb-5">
+      <div className="mx-auto flex h-15 max-w-280 items-center justify-between gap-4 rounded-full border border-grey-line bg-white pr-2 pl-4 min-[360px]:pl-6 lg:h-17">
+        <Link href="/" className="shrink-0 text-black">
+          <Logo className="h-6.5 w-auto" />
         </Link>
-        <Link href="/calculator" className="text-black hover:text-green">
-          Calculator
-        </Link>
-        <Link href="/app" className={buttonClass("primary", "md", "h-10 px-5")}>
-          Start saving
-        </Link>
-      </nav>
+        <nav aria-label="Main" className="hidden gap-1 text-label font-semibold lg:flex">
+          {LINKS.map((link) => {
+            const here = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={here ? "page" : undefined}
+                className={`flex h-11 items-center rounded-full px-4.5 transition-[background-color] duration-150 ease-out ${
+                  here ? "bg-mint text-black" : "text-grey-text hover:bg-grey-surface"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
+        </nav>
+        <div className="flex items-center gap-2">
+          <Link href="/app" className={buttonClass(cta, "md", "h-11 px-4 min-[360px]:px-5")}>
+            Start saving
+          </Link>
+          <button
+            type="button"
+            aria-label="Open menu"
+            onClick={() => setMenuOpen(true)}
+            className="flex size-11 items-center justify-center rounded-full border border-grey-line transition-[background-color] duration-150 ease-out hover:bg-grey-surface lg:hidden"
+          >
+            <MenuIcon />
+          </button>
+        </div>
+      </div>
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} items={MENU} />
     </header>
   );
 }
