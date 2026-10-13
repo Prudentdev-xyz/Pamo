@@ -1,0 +1,2 @@
+# Design tool exports are reference files, not Pamo source: keep them out of the language stats.
+Brand[[:space:]]Kit[[:space:]]&[[:space:]]Design/** linguist-vendored
