@@ -480,13 +480,13 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [ ] **#5** Find the mainnet verifier URL (found: `https://explorer.arc.io/api/`, see §4; not yet tried with `arc-forge`); **deploy `PamoSavings` to Arc mainnet** and verify the source
 - [ ] With `arc-cast` on mainnet: open a pot, deposit 1 USDC, withdraw it
 - [ ] Switch the env vars to mainnet (Arch §9): chain ID, RPC URL, contract address, Circle mainnet key
-- [ ] Deploy web to Vercel (env vars from Arch §9), pointing at mainnet and the hosted Express
+- [ ] Deploy web to Vercel (env vars from Arch §9), pointing at mainnet and the hosted Express (live on testnet at `https://pamosafe.vercel.app`, deployed before the mainnet move so the phone checks have a public URL; still to repoint at mainnet)
 - [ ] Production Supabase + indexer running; `/api/health` shows the indexer caught up
 - [x] Phone-width check of every screen (done at 390 px on the testnet build: landing, portfolios, calculator, dashboard, new pot flow, pot page, both reviews, the menu and the connect, wrong-network and backend-down states; nothing overflows. To repeat on the mainnet deploy, and on a real phone for #10)
 
 ### Phase 7: Story (Oct 13)
 
-- [ ] README: what Pamo is, live URL, contract address + explorer link, architecture diagram (from Arch §2), how to run, roadmap
+- [x] README: what Pamo is, live URL, contract address + explorer link, architecture diagram (from Arch §2), how to run, roadmap (written with the testnet URL and address; the mainnet address and explorer link go in after the deploy)
 - [x] Redraw `pamo-pseudocode.png` first (it shows an older design: tier per user, `apy / 12`), then add it to the README
 - [ ] Record a 2–3 minute demo video: problem → save → goal → calculator → explorer proof
 - [ ] Draft the DoraHacks submission; attach `Brand Kit & Design/Pamo_Spec_Arc.pdf`

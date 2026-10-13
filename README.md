@@ -27,10 +27,10 @@ The name comes from the Yoruba *fi pamọ́*, "keep it safe".
 
 | Network | Chain ID | `PamoSavings` | Web app |
 |---|---|---|---|
-| Arc testnet | `5042002` | [`0x9952E937378bb093DFA010e94FC81D56EC4cBF17`](https://explorer.testnet.arc.io/address/0x9952E937378bb093DFA010e94FC81D56EC4cBF17) (source verified) | Runs locally against testnet |
+| Arc testnet | `5042002` | [`0x9952E937378bb093DFA010e94FC81D56EC4cBF17`](https://explorer.testnet.arc.io/address/0x9952E937378bb093DFA010e94FC81D56EC4cBF17) (source verified) | [pamosafe.vercel.app](https://pamosafe.vercel.app) |
 | Arc mainnet | `5042` | Pending | Pending |
 
-The mainnet address, explorer link and live URL are added here once the mainnet deploy is done.
+The live site runs on Arc testnet today. The mainnet address and explorer link are added here once the mainnet deploy is done, and the site moves to mainnet with it.
 
 ---
 
@@ -739,7 +739,7 @@ Changes to `PamoSavings.sol` need a test that fails without them.
 
 ## 16. License
 
-The contract source is marked MIT (`SPDX-License-Identifier: MIT`).
+MIT. See [LICENSE](LICENSE).
 
 ---
 
