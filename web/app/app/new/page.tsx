@@ -1,14 +1,15 @@
 "use client";
 
 import { AnimatePresence, motion } from "motion/react";
-import Link from "next/link";
 import { use, useEffect, useReducer, useState } from "react";
 import { useConnection } from "wagmi";
+import { AmountCard } from "@/components/AmountCard";
 import { Banner } from "@/components/Banner";
 import { Button } from "@/components/Button";
 import { DateField } from "@/components/DateField";
 import { Field } from "@/components/Field";
-import { BackIcon, CopyIcon, LockIcon, TickIcon, UnlockIcon } from "@/components/Icon";
+import { FlowHeader } from "@/components/FlowHeader";
+import { CopyIcon, LockIcon, TickIcon, UnlockIcon } from "@/components/Icon";
 import { KindBadge } from "@/components/KindBadge";
 import { ReviewSheet } from "@/components/ReviewSheet";
 import { SavedScreen } from "@/components/SavedScreen";
@@ -21,7 +22,7 @@ import { KIND_ANYTIME, KIND_GOAL, MAX_NAME_BYTES, PAMO_SAVINGS, pamoSavingsAbi, 
 import { formatApy, formatDate, formatEstimate, formatUsdc, parseUsdc, shortAddress, usdcInputValue, usdcToNumber } from "@/lib/format";
 import { earliestUnlockDate, initialNewPot, newPotReducer, newPotSteps, unlockAtFromDate } from "@/lib/newPot";
 import { LENDING_NOTE } from "@/lib/tiers";
-import { openPot } from "@/lib/tx";
+import { FEE_RESERVE, openPot } from "@/lib/tx";
 import { usePaused } from "@/lib/usePaused";
 import { useSaveReview } from "@/lib/useReview";
 import { useUsdcBalance } from "@/lib/useUsdcBalance";
@@ -44,9 +45,6 @@ const HEADINGS = {
   tier: ["Choose a portfolio", LENDING_NOTE],
   amount: ["How much to save?", "Start with any amount. You can add more later."],
 } as const;
-
-// Network fees are paid in USDC, so Max holds this much back: several times what an Allow and a Save cost.
-const FEE_RESERVE = 100_000n; // 0.10 USDC
 
 // Where to send someone who needs USDC: the faucet while Pamo runs on a test network.
 const GET_USDC = chain.testnet
@@ -136,10 +134,8 @@ export default function NewPot({ searchParams }: { searchParams: Promise<{ kind?
     return (
       <SavedScreen
         amount={amount}
-        potName={potLabel}
-        tierName={TIERS[state.tier]!}
-        apy={tierVault ? formatApy(tierVault.apy) : null}
-        potHref={state.potId !== null ? `/app/pot/${state.potId}` : null}
+        line={`into ${potLabel} · ${TIERS[state.tier]!}.${tierVault ? ` Earning at ${formatApy(tierVault.apy)} APY today, which changes daily.` : ""}`}
+        viewPot={state.potId !== null ? `/app/pot/${state.potId}` : null}
         dashboardHref={state.potId !== null ? `/app?new=${state.potId}` : "/app"}
       />
     );
@@ -171,32 +167,14 @@ export default function NewPot({ searchParams }: { searchParams: Promise<{ kind?
   return (
     <div className="mx-auto grid w-full max-w-220 grid-cols-[minmax(0,1fr)] gap-6">
       <div className="grid gap-3.5">
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => dispatch({ type: "back" })}
-            disabled={shown === "type"}
-            aria-label="Back"
-            className="flex h-11 min-w-11 items-center justify-center gap-2 rounded-full border border-grey-line text-label font-semibold transition-[background-color] duration-150 ease-out hover:bg-grey-surface disabled:invisible lg:pr-4 lg:pl-3"
-          >
-            <BackIcon size={18} />
-            <span className="hidden lg:inline">Back</span>
-          </button>
-          <p className="grid justify-items-center gap-0.5">
-            <b className="text-label font-semibold tabular-nums">
-              Step {steps.current + 1} of {steps.titles.length}
-            </b>
-            <span className="text-caption text-grey-text">
-              {shown === "type" && picked === null ? "New pot" : (shown === "type" ? picked === KIND_GOAL : isGoal) ? "New Goal Vault" : "New Anytime Vault"}
-            </span>
-          </p>
-          <Link
-            href="/app"
-            className="flex h-11 min-w-11 items-center justify-end text-label font-semibold text-grey-text transition-[color] duration-150 ease-out hover:text-black"
-          >
-            Cancel
-          </Link>
-        </div>
+        <FlowHeader
+          title={`Step ${steps.current + 1} of ${steps.titles.length}`}
+          subtitle={
+            shown === "type" && picked === null ? "New pot" : (shown === "type" ? picked === KIND_GOAL : isGoal) ? "New Goal Vault" : "New Anytime Vault"
+          }
+          onBack={shown === "type" ? undefined : () => dispatch({ type: "back" })}
+          cancel="/app"
+        />
         <Stepper titles={steps.titles} current={steps.current} />
       </div>
 
@@ -317,48 +295,14 @@ export default function NewPot({ searchParams }: { searchParams: Promise<{ kind?
                 <KindBadge kind={state.kind} />
                 <TierChip tier={state.tier} />
               </div>
-              <label
-                className={`grid grid-cols-[minmax(0,1fr)] gap-2.5 rounded-card border p-5 transition-[border-color,box-shadow] duration-150 ease-out focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-green lg:p-7 ${
-                  overBalance
-                    ? "border-error shadow-[inset_0_0_0_1px_var(--color-error)]"
-                    : state.amountText
-                      ? "border-black"
-                      : "border-grey-line"
-                }`}
-              >
-                <span className="text-label text-grey-text">You save</span>
-                <span className="flex items-baseline gap-2.5">
-                  <input
-                    value={state.amountText}
-                    onChange={(e) => dispatch({ type: "set", field: "amountText", value: e.target.value })}
-                    name="amount"
-                    inputMode="decimal"
-                    placeholder="0.00"
-                    autoComplete="off"
-                    size={1}
-                    aria-label="Amount to save in USDC"
-                    aria-invalid={overBalance || undefined}
-                    // A long amount steps down a size, so every digit stays in view.
-                    className={`min-w-0 flex-1 bg-transparent font-bold tracking-[-0.03em] tabular-nums outline-none placeholder:text-grey-muted ${
-                      state.amountText.length > 9 ? "text-h2 lg:text-display" : "text-display lg:text-balance"
-                    }`}
-                  />
-                  <span className="text-h3 font-semibold text-grey-text">USDC</span>
-                </span>
-                <span className="flex flex-wrap items-center justify-between gap-2 border-t border-grey-line pt-2.5 text-label text-grey-text tabular-nums">
-                  {balance.data !== undefined ? `In your wallet: ${formatUsdc(balance.data)}` : "Reading your wallet…"}
-                  {maxText && (
-                    <button
-                      type="button"
-                      aria-label={`Save the most you can, keeping ${formatUsdc(FEE_RESERVE)} for network fees`}
-                      onClick={() => dispatch({ type: "set", field: "amountText", value: maxText })}
-                      className="rounded-sm bg-mint px-3 py-1.5 text-caption font-semibold text-green transition-[background-color,transform] duration-150 ease-out hover:bg-grey-line active:scale-[0.97]"
-                    >
-                      Max
-                    </button>
-                  )}
-                </span>
-              </label>
+              <AmountCard
+                label="You save"
+                value={state.amountText}
+                onChange={(value) => dispatch({ type: "set", field: "amountText", value })}
+                invalid={overBalance}
+                footer={balance.data !== undefined ? `In your wallet: ${formatUsdc(balance.data)}` : "Reading your wallet…"}
+                max={maxText ? { value: maxText, hint: `Save the most you can, keeping ${formatUsdc(FEE_RESERVE)} for network fees` } : null}
+              />
               {maxText !== null && state.amountText === maxText && (
                 <p className="text-caption text-grey-text">Max keeps {formatUsdc(FEE_RESERVE)} back for network fees.</p>
               )}

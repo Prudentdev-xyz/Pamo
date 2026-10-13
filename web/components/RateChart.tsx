@@ -21,7 +21,7 @@ export function RateChart({ tier }: { tier: TierKey }) {
           <XAxis dataKey="at" type="number" domain={["dataMin", "dataMax"]} hide />
           <YAxis domain={["auto", "auto"]} tickFormatter={formatApy} width={56} tick={{ fontSize: 12 }} />
           <Tooltip formatter={(apy) => [formatApy(Number(apy)), "APY"]} labelFormatter={(at) => formatDateTime(Number(at))} />
-          <Line type="monotone" dataKey="apy" stroke="#0A0A0A" strokeWidth={2} dot={false} isAnimationActive={false} />
+          <Line type="monotone" dataKey="apy" stroke="var(--color-black)" strokeWidth={2} dot={false} isAnimationActive={false} />
         </LineChart>
       </ResponsiveContainer>
     </div>

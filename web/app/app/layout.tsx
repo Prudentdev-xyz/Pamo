@@ -163,7 +163,7 @@ function SidebarPots({ connected, pathname }: { connected: boolean; pathname: st
   const pots = usePots();
   const info = usePotInfo();
   return (
-    <div className="grid gap-1">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-1">
       <h2 className="px-3 pb-1 text-caption font-semibold text-grey-text">Your pots</h2>
       {!connected ? (
         <p className="px-3 text-label text-grey-text">Connect to see your pots.</p>
@@ -178,12 +178,14 @@ function SidebarPots({ connected, pathname }: { connected: boolean; pathname: st
               key={id.toString()}
               href={href}
               aria-current={here ? "page" : undefined}
-              className={`${rowClass} justify-between text-black ${here ? "bg-mint font-semibold hover:bg-mint" : ""}`}
+              className={`${rowClass} min-w-0 justify-between text-black ${here ? "bg-mint font-semibold hover:bg-mint" : ""}`}
             >
               <span title={info.byId.get(id.toString())?.name || fallbackPotName(pot.kind, id)} className="min-w-0 truncate">
                 {info.byId.get(id.toString())?.name || fallbackPotName(pot.kind, id)}
               </span>
-              <LevelMark tier={pot.tier} />
+              <span className="shrink-0">
+                <LevelMark tier={pot.tier} />
+              </span>
             </Link>
           );
         })

@@ -8,6 +8,9 @@ import { wagmiConfig } from "./wagmi";
 /** Called once the wallet has sent the transaction, before it is confirmed. */
 export type OnSent = (hash: Hash) => void;
 
+/** Network fees are paid in USDC, so "Max" holds this much back: several times what an Allow and a Save cost. */
+export const FEE_RESERVE = 100_000n; // 0.10 USDC
+
 // Arc silently drops transactions that offer less than 20 Gwei.
 const MIN_FEE_PER_GAS = parseGwei("20");
 

@@ -447,7 +447,7 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [x] Routes: `/api/quotes/*`, `/api/owners/:addr/activity`, `/api/owners/:addr/pots`, `/api/pots/:id`, `/api/vaults/history`; zod + rate limit + CORS
 - [x] Goal pots: create flow, progress bar, lock rules in the UI (a goal was opened through the app on testnet and shows as locked)
 - [x] New pot stepper (state machine from Arch §8.2)
-- [ ] Review screens for save and withdraw (§6) (a real save went through the save review; a withdrawal through the withdrawal review is still to run)
+- [x] Review screens for save and withdraw (§6) (real saves and real withdrawals, part and then all, went through their reviews on testnet)
 - [x] Portfolios page with live tier data and rate history (the history line fills in once snapshots are being stored)
 - [x] Growth Calculator with the Recharts curve (checked against the formula: 100 + 50 a month for 12 months at 4.20% gives 717.76)
 - [x] Pot detail with activity from Supabase
@@ -459,12 +459,12 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [x] Tailwind theme tokens: copy the `@theme` block from Brand_Design.md §8 (colours, font, spacing, radii, shadow, type scale)
 - [x] Load Be Vietnam Pro (400, 600, 700) with `next/font`
 - [x] Logo: the exports in `Brand Kit & Design/Pamo Logos/` are PNG only. Make an SVG wordmark with outlined text for the web app's public folder (`web/public/pamo-wordmark.svg` and `web/components/Logo.tsx`, outlined from Be Vietnam Pro Bold, with the dot and the accent as separate paths for the logo motion)
-- [ ] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet (done for the app shell, the dashboard and the new pot flow; the other screens follow)
+- [ ] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet (done for the app shell, the dashboard, the new pot flow and the pot page; portfolios, calculator and landing follow)
 - [x] Install `motion`, `animejs`, `iconsax-react` in `web/`
 - [x] `web/motion/`: `tokens.ts`, Motion `variants.ts`, anime.js `countUp.ts`
 - [ ] Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3) (done: route transitions, pot cards, progress bars, live APY dot, stepper, tier `layoutId`, review sheet, button pending state, success check)
-- [ ] anime.js: total saved / earned count-ups, calculator result (done: total saved, earned and the tier rates on the dashboard, and the saved amount on the success screen)
-- [ ] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5) (wrapper done; applied to the app shell, the dashboard and the new pot flow)
+- [ ] anime.js: total saved / earned count-ups, calculator result (done: total saved, earned and the tier rates on the dashboard, the amount on the success screen, and a pot's value counting from old to new)
+- [ ] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5) (wrapper done; applied to the app shell, the dashboard, the new pot flow and the pot page)
 - [ ] Reduced-motion support in all three libraries (§7.4)
 - [ ] All error and empty states (§6)
 

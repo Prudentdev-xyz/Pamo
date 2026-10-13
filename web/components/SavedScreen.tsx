@@ -2,31 +2,40 @@
 
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { formatCount, formatUsdcNumber, usdcToNumber } from "@/lib/format";
+import { formatCount, formatUsdc, formatUsdcNumber, usdcToNumber } from "@/lib/format";
 import { duration, ease } from "@/motion/tokens";
 import { CountUp } from "./CountUp";
 
-/** The one green screen: shown once a save has confirmed. The check draws itself, then the amount counts up. */
+const primaryClass =
+  "flex h-13 w-full items-center justify-center rounded-full bg-white text-body font-semibold text-black transition-[opacity,transform] duration-150 ease-out select-none hover:opacity-90 active:scale-[0.97] focus-visible:outline-white";
+
+/**
+ * The one green screen: shown once a save or a withdrawal has confirmed.
+ * The check draws itself, then the amount counts up.
+ */
 export function SavedScreen({
+  title = "Saved",
   amount,
-  potName,
-  tierName,
-  apy,
-  potHref,
+  line,
+  holds,
+  viewPot,
   dashboardHref,
 }: {
+  /** "Saved" or "Withdrawn". */
+  title?: string;
   amount: bigint;
-  potName: string;
-  tierName: string;
-  /** Today's rate as "4.20%", or null when live rates are unavailable. */
-  apy: string | null;
-  potHref: string | null;
+  /** One sentence under the amount: where the money went. */
+  line: ReactNode;
+  /** What the pot is worth now, when that is known. */
+  holds?: { potName: string; value: bigint } | null;
+  /** "View pot": a link to the pot, or a way back to it when it is already on this page. */
+  viewPot: string | (() => void) | null;
   dashboardHref: string;
 }) {
   const reduce = useReducedMotion();
-  const first = useRef<HTMLAnchorElement>(null);
+  const first = useRef<HTMLElement>(null);
   useEffect(() => first.current?.focus(), []);
 
   // Rendered on the body, so it covers the page whatever is animating around it.
@@ -48,22 +57,28 @@ export function SavedScreen({
             transition={{ duration: duration.slow, ease, delay: 0.1 }}
           />
         </svg>
-        <h1 className="mt-2 text-h1 font-bold tracking-[-0.03em] lg:text-balance">Saved</h1>
+        <h1 className="mt-2 text-h1 font-bold tracking-[-0.03em] lg:text-balance">{title}</h1>
         <p className="text-h1 font-bold tabular-nums">
           <CountUp value={usdcToNumber(amount)} format={formatCount} final={formatUsdcNumber(amount)} /> USDC
         </p>
-        <p className="text-body">
-          into {potName} · {tierName}.{apy ? ` Earning at ${apy} APY today, which changes daily.` : ""}
-        </p>
+        <p className="text-body">{line}</p>
+        {holds && (
+          <p className="grid gap-0.5 rounded-card border border-white/40 px-5.5 py-3.5">
+            <span className="text-caption">{holds.potName} now holds</span>
+            <b className="text-h2 font-bold tabular-nums">{formatUsdc(holds.value)}</b>
+          </p>
+        )}
         <div className="mt-4 grid w-full gap-3">
-          {potHref && (
-            <Link
-              ref={first}
-              href={potHref}
-              className="flex h-13 items-center justify-center rounded-full bg-white text-body font-semibold text-black transition-[opacity,transform] duration-150 ease-out select-none hover:opacity-90 active:scale-[0.97] focus-visible:outline-white"
-            >
+          {typeof viewPot === "string" ? (
+            <Link ref={first as React.RefObject<HTMLAnchorElement>} href={viewPot} className={primaryClass}>
               View pot
             </Link>
+          ) : (
+            viewPot && (
+              <button ref={first as React.RefObject<HTMLButtonElement>} type="button" onClick={viewPot} className={primaryClass}>
+                View pot
+              </button>
+            )
           )}
           <Link
             href={dashboardHref}
