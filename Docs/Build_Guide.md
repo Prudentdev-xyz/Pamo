@@ -239,7 +239,7 @@ Endpoints, schema and indexer pseudocode: **Arch §5**.
 - Hero: the **Pamọ́** logo, "Keep it safe. Your USDC savings earn while they sit." → **Start saving**.
 - "How it works" strip: wallet → Pamo → lending vault → interest back.
 - Three cards: Anytime, Goal, Portfolios. Calculator teaser with live rates.
-- Footer: "Live on Arc mainnet", contract address linked to the explorer, GitHub link.
+- Footer: "Currently on Arc. More chains planned.", contract address linked to the explorer, GitHub link. This is the one place the product names its chain outside of wallet steps and explorer links.
 
 **2. Dashboard** (`/app`)
 - Top: **Total saved** (big), **Earned so far** (green), live APY per tier.
@@ -310,7 +310,7 @@ Left in this pot    30.31 USDC
 
 ### States to design for
 
-- Wrong network → "Pamo runs on Arc" + **Switch to Arc**.
+- Wrong network → "Pamo is currently on Arc" + **Switch to Arc**.
 - Not enough USDC → show the balance and how to get USDC on Arc.
 - Pending transaction → button spinner + explorer link (Arc finalises in under a second).
 - Vault short on cash → "The vault is short on cash right now. Try a smaller amount or try again later."
@@ -456,15 +456,15 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 
 ### Phase 5: Design system + motion (Oct 11–12)
 
-- [ ] Tailwind theme tokens: copy the `@theme` block from Brand_Design.md §8 (colours, font, spacing, radii, shadow, type scale)
-- [ ] Load Be Vietnam Pro (400, 600, 700) with `next/font`
-- [ ] Logo: the exports in `Brand Kit & Design/Pamo Logos/` are PNG only. Make an SVG wordmark with outlined text for the web app's public folder
-- [ ] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet
-- [ ] Install `motion`, `animejs`, `iconsax-react` in `web/`
-- [ ] `web/motion/`: `tokens.ts`, Motion `variants.ts`, anime.js `countUp.ts`
-- [ ] Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3)
-- [ ] anime.js: total saved / earned count-ups, calculator result
-- [ ] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5)
+- [x] Tailwind theme tokens: copy the `@theme` block from Brand_Design.md §8 (colours, font, spacing, radii, shadow, type scale)
+- [x] Load Be Vietnam Pro (400, 600, 700) with `next/font`
+- [x] Logo: the exports in `Brand Kit & Design/Pamo Logos/` are PNG only. Make an SVG wordmark with outlined text for the web app's public folder (`web/public/pamo-wordmark.svg` and `web/components/Logo.tsx`, outlined from Be Vietnam Pro Bold, with the dot and the accent as separate paths for the logo motion)
+- [ ] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet (done for the app shell and the dashboard; the other screens follow)
+- [x] Install `motion`, `animejs`, `iconsax-react` in `web/`
+- [x] `web/motion/`: `tokens.ts`, Motion `variants.ts`, anime.js `countUp.ts`
+- [ ] Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3) (done: route transitions, pot cards, progress bars, live APY dot)
+- [ ] anime.js: total saved / earned count-ups, calculator result (done: total saved, earned and the tier rates on the dashboard)
+- [ ] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5) (wrapper done; applied to the app shell and the dashboard)
 - [ ] Reduced-motion support in all three libraries (§7.4)
 - [ ] All error and empty states (§6)
 
