@@ -41,3 +41,50 @@
 
   --breakpoint-desktop: 1440px;  /* phone first, base width 390 */
 }
+
+/* The parts the browser draws take the brand too. */
+@layer base {
+  ::selection {
+    background-color: var(--color-mint);
+    color: var(--color-black);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-green);
+    outline-offset: 2px;
+  }
+
+  html {
+    /* The browser's grey flash on tap fights the press states the components draw themselves. */
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  a {
+    text-underline-offset: 3px;
+  }
+
+  /* No double-tap wait on controls, and a long press never selects a button's label. */
+  a,
+  button,
+  [role="button"] {
+    touch-action: manipulation;
+  }
+
+  button,
+  [role="button"] {
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}

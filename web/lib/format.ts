@@ -1,11 +1,20 @@
 import { formatUnits, parseUnits } from "viem";
 import { USDC_DECIMALS } from "./contract";
 
-/** "120.50 USDC" from a 6-decimal amount. Shows 2 decimals, more only when they are needed. */
-export function formatUsdc(amount: bigint): string {
+/** "120.50" from a 6-decimal amount, for screens that set the number and "USDC" in different sizes. */
+export function formatUsdcNumber(amount: bigint): string {
   const n = Number(formatUnits(amount, USDC_DECIMALS));
-  return `${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 6 })} USDC`;
+  return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 6 });
 }
+
+/** "120.50 USDC" from a 6-decimal amount. Shows 2 decimals, more only when they are needed. */
+export const formatUsdc = (amount: bigint) => `${formatUsdcNumber(amount)} USDC`;
+
+/** A 6-decimal amount as a plain number, for count-ups and charts only. Money maths stays in bigint. */
+export const usdcToNumber = (amount: bigint) => Number(formatUnits(amount, USDC_DECIMALS));
+
+/** A number mid count-up: "1,234.56". */
+export const formatCount = (n: number) => n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 /** A plain decimal string for an input field, e.g. "120.5". */
 export const usdcInputValue = (amount: bigint) => formatUnits(amount, USDC_DECIMALS);

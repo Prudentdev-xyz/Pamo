@@ -10,6 +10,9 @@
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.1",
+    "animejs": "^4.5.0",
+    "iconsax-react": "^0.0.8",
+    "motion": "^14.1.0",
     "next": "^16.4.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",

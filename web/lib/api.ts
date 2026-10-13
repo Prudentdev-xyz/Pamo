@@ -120,5 +120,9 @@ export const fetchWithdrawQuote = (input: { owner: string; potId: bigint; amount
 
 export const fetchOwnerPots = (owner: string) => get<PotInfo[]>(`/api/owners/${owner}/pots`);
 
+/** Every pot's deposits and withdrawals for one owner, newest first. */
+export const fetchOwnerActivity = (owner: string, limit = 200) =>
+  get<ActivityItem[]>(`/api/owners/${owner}/activity?limit=${limit}`);
+
 export const fetchActivity = (owner: string, potId: bigint) =>
   get<ActivityItem[]>(`/api/owners/${owner}/activity?potId=${potId}&limit=50`);

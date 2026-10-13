@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { useConnection } from "wagmi";
-import { fetchActivity, fetchOwnerPots, type PotInfo } from "./api";
+import { fetchActivity, fetchOwnerActivity, fetchOwnerPots, type PotInfo } from "./api";
 
 /** Pot names from the indexer, by pot id. Empty while the backend is down: screens fall back to "Anytime Vault #12". */
 export function usePotInfo() {
@@ -26,6 +26,18 @@ export function useActivity(potId: bigint | null) {
     enabled: !!address && potId !== null,
     retry: 1,
     // The indexer reads new events every 5 seconds.
+    refetchInterval: 10_000,
+  });
+}
+
+/** The owner's deposits and withdrawals across all pots, newest first, for the dashboard. */
+export function useOwnerActivity() {
+  const { address } = useConnection();
+  return useQuery({
+    queryKey: ["activity", address, "all"],
+    queryFn: () => fetchOwnerActivity(address!),
+    enabled: !!address,
+    retry: 1,
     refetchInterval: 10_000,
   });
 }

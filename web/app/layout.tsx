@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 import type { ReactNode } from "react";
 import { Providers } from "@/components/Providers";
@@ -14,6 +14,12 @@ const beVietnamPro = Be_Vietnam_Pro({
 export const metadata: Metadata = {
   title: "Pamo",
   description: "Keep it safe. Your USDC savings earn while they sit.",
+};
+
+// The page paints under the notch and pads itself back out; the browser bar matches the white page.
+export const viewport: Viewport = {
+  viewportFit: "cover",
+  themeColor: "#FFFFFF",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
