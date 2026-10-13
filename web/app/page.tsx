@@ -161,7 +161,7 @@ export default function Home() {
 
       <SiteFooter />
 
-      {/* The logo intro's screen, once per visit. LandingMotion plays it. */}
+      {/* The logo intro's screen. LandingMotion plays it on every load of this page. */}
       <div data-intro-screen aria-hidden="true" className="fixed inset-0 z-50 motion-reduce:hidden">
         <div data-intro-wipe className="absolute inset-x-0 top-0 h-[calc(100%+200px)] rounded-b-[50%_200px] bg-white" />
         <div className="absolute inset-0 flex items-center justify-center">

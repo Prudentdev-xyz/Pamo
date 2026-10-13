@@ -2,14 +2,13 @@
 
 import { animate, stagger, type JSAnimation } from "animejs";
 import { useEffect } from "react";
-import { SEEN_KEY } from "./boot";
 
 const all = <T extends Element>(selector: string) => [...document.querySelectorAll<T>(selector)];
 
 /**
  * The landing page's motion (Build Guide §7.3). It draws nothing itself.
  * - Logo intro, anime.js: a white screen where "Pamo" writes in, the tone marks settle and the wordmark travels
- *   up into the nav. Once per visit, at every width.
+ *   up into the nav. On every load of the landing page, at every width.
  * - Hero lines, feature cards and the text of the sections below, GSAP: loaded here with a dynamic import, so GSAP is only ever fetched on `/`.
  * With reduced motion on, none of it runs and everything is in place.
  */
@@ -17,14 +16,11 @@ export function LandingMotion() {
   useEffect(() => {
     const root = document.documentElement;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    // Arriving from another page: the boot script did not run, so do its job here.
+    // Arriving from another page: the boot script did not run, so do its job here. The intro is for a fresh load
+    // of the landing page only, so it does not play on the way back from another page.
     if (root.dataset.intro === undefined && root.dataset.motion === undefined) {
-      let seen = true;
-      try {
-        seen = sessionStorage.getItem(SEEN_KEY) !== null;
-      } catch {}
       if (!reduced) root.dataset.motion = "on";
-      if (reduced || seen) root.dataset.intro = "seen";
+      root.dataset.intro = "seen";
     }
     root.dataset.ready = "1";
     const moving = root.dataset.motion === "on";
@@ -88,9 +84,6 @@ export function LandingMotion() {
       root.dataset.intro = "seen";
       root.style.overflow = "";
       all<SVGElement>("[data-nav-logo] [data-logo], [data-intro-screen] [data-logo]").forEach((path) => path.removeAttribute("style"));
-      try {
-        sessionStorage.setItem(SEEN_KEY, "1");
-      } catch {}
       window.removeEventListener("pointerdown", finishIntro);
       window.removeEventListener("keydown", finishIntro);
       startHero();
