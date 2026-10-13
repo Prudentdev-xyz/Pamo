@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
 import type { ReactNode } from "react";
+import { LANDING_BOOT } from "@/components/landing/boot";
 import { Providers } from "@/components/Providers";
 import "./globals.css";
 
@@ -23,8 +24,13 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
+  // The landing page marks <html> before React loads, so its attributes may differ from the server's.
   return (
-    <html lang="en" className={beVietnamPro.variable}>
+    <html lang="en" className={beVietnamPro.variable} suppressHydrationWarning>
+      <head>
+        {/* Landing page only: marks <html> before the first paint with what its intro and scroll motion will animate. */}
+        <script dangerouslySetInnerHTML={{ __html: LANDING_BOOT }} />
+      </head>
       <body className="min-h-screen bg-white text-black antialiased">
         <Providers>{children}</Providers>
       </body>

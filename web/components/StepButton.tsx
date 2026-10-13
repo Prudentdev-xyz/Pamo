@@ -36,6 +36,14 @@ export function StepButton({
       {step.status === "error" && (
         <p role="alert" className="text-label text-error">
           {step.error}
+          {step.hash && (
+            <>
+              {" "}
+              <a href={explorerTx(step.hash)} target="_blank" rel="noreferrer" className="font-semibold underline underline-offset-[3px]">
+                View on explorer
+              </a>
+            </>
+          )}
         </p>
       )}
     </div>

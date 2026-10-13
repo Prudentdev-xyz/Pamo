@@ -89,7 +89,8 @@ export function SaveSteps({
   const second: RowState = savingNow ? "pending" : allowed && !allowing ? "active" : "todo";
   const onFirst = !allowed || allowing;
   const active = onFirst ? allow.step : saving.step;
-  const error = saving.step.status === "error" ? saving.step.error : allow.step.status === "error" ? allow.step.error : null;
+  const failed = saving.step.status === "error" ? saving.step : allow.step.status === "error" ? allow.step : null;
+  const error = failed?.error ?? null;
   const amountText = amount !== null ? formatUsdc(amount) : "your USDC";
 
   return (
@@ -99,6 +100,11 @@ export function SaveSteps({
           <Banner tone="error">
             <b className="block font-semibold">{error}</b>
             {error === CANCELLED && "You turned down the request in your wallet. Try again when you are ready."}
+            {failed?.hash && (
+              <a href={explorerTx(failed.hash)} target="_blank" rel="noreferrer" className="font-semibold underline underline-offset-[3px]">
+                View on explorer
+              </a>
+            )}
           </Banner>
         </motion.div>
       )}

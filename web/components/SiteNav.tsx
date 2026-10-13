@@ -8,12 +8,13 @@ import { MenuIcon } from "./Icon";
 import { Logo } from "./Logo";
 import { MobileMenu, type MenuItem } from "./MobileMenu";
 
-const LINKS: MenuItem[] = [
+export const SITE_LINKS: MenuItem[] = [
+  { href: "/#how-it-works", label: "How it works" },
   { href: "/portfolios", label: "Portfolios" },
   { href: "/calculator", label: "Calculator" },
 ];
 
-const MENU: MenuItem[] = [...LINKS, { href: "/app", label: "Start saving" }];
+export const SITE_MENU: MenuItem[] = [...SITE_LINKS, { href: "/app", label: "Start saving" }];
 
 /** The floating header on the pages that need no wallet. */
 export function SiteNav({
@@ -32,7 +33,7 @@ export function SiteNav({
           <Logo className="h-6.5 w-auto" />
         </Link>
         <nav aria-label="Main" className="hidden gap-1 text-label font-semibold lg:flex">
-          {LINKS.map((link) => {
+          {SITE_LINKS.map((link) => {
             const here = pathname === link.href;
             return (
               <Link
@@ -62,7 +63,7 @@ export function SiteNav({
           </button>
         </div>
       </div>
-      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} items={MENU} />
+      <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} pathname={pathname} items={SITE_MENU} />
     </header>
   );
 }

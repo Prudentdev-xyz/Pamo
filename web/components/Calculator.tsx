@@ -7,6 +7,7 @@ import { TIER_INFO } from "@/lib/tiers";
 import { useDebounced } from "@/lib/useDebounced";
 import { useVaults } from "@/lib/useVaults";
 import { Banner } from "./Banner";
+import { Blank } from "./Blank";
 import { ButtonLink } from "./Button";
 import { Card } from "./Card";
 import { CountUp } from "./CountUp";
@@ -190,7 +191,7 @@ export function Calculator() {
             </div>
           ) : (
             <p aria-hidden="true" className="text-display font-bold text-grey-muted lg:text-balance">
-              —
+              <Blank />
             </p>
           )}
         </div>

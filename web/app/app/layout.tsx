@@ -55,7 +55,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
         Skip to content
       </a>
       <aside className="sticky top-0 hidden h-dvh w-65 shrink-0 flex-col gap-8 overflow-y-auto border-r border-grey-line px-4 pt-7 pb-6 lg:flex">
-        <Link href="/app" className="px-3 text-black">
+        <Link href="/" aria-label="Pamo home" className="px-3 text-black">
           <Logo className="h-7.5 w-auto" />
         </Link>
         <nav aria-label="Main" className="grid gap-1">
@@ -112,7 +112,7 @@ export default function AppLayout({ children }: { children: ReactNode }) {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="box-content flex h-15 shrink-0 items-center justify-between px-4 pt-[env(safe-area-inset-top)] lg:hidden">
-          <Link href="/app" className="text-black">
+          <Link href="/" aria-label="Pamo home" className="text-black">
             <Logo className="h-7 w-auto" />
           </Link>
           <button

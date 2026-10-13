@@ -459,21 +459,21 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [x] Tailwind theme tokens: copy the `@theme` block from Brand_Design.md §8 (colours, font, spacing, radii, shadow, type scale)
 - [x] Load Be Vietnam Pro (400, 600, 700) with `next/font`
 - [x] Logo: the exports in `Brand Kit & Design/Pamo Logos/` are PNG only. Make an SVG wordmark with outlined text for the web app's public folder (`web/public/pamo-wordmark.svg` and `web/components/Logo.tsx`, outlined from Be Vietnam Pro Bold, with the dot and the accent as separate paths for the logo motion)
-- [ ] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet (done for the app shell, the dashboard, the new pot flow, the pot page, portfolios and the calculator; the landing page follows)
+- [x] Build the components from the design system file, then apply them to every screen: logo, tier chips, cards, sheet (applied to the app shell, the dashboard, the new pot flow, the pot page, portfolios, the calculator and the landing page)
 - [x] Install `motion`, `animejs`, `iconsax-react` in `web/`
 - [x] `web/motion/`: `tokens.ts`, Motion `variants.ts`, anime.js `countUp.ts`
-- [ ] Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3) (done: route transitions, pot cards, progress bars, live APY dot, stepper, tier `layoutId`, review sheet, button pending state, success check)
+- [x] Motion: route transitions, stepper, tier `layoutId`, review sheet, pot cards, progress bars, button pending state, success check (§7.3) (done: route transitions, pot cards, progress bars, live APY dot, stepper, tier `layoutId`, review sheet, button pending state, success check)
 - [x] anime.js: total saved / earned count-ups, calculator result (total saved, earned and the tier rates on the dashboard, the amount on the success screen, a pot's value counting from old to new, and the three calculator results counting to their new value once the inputs settle)
-- [ ] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5) (wrapper done; applied to the app shell, the dashboard, the new pot flow, the pot page, portfolios and the calculator)
-- [ ] Reduced-motion support in all three libraries (§7.4)
-- [ ] All error and empty states (§6)
+- [x] Iconsax: `web/components/Icon.tsx` wrapper, icons applied across screens (§7.5)
+- [x] Reduced-motion support in all three libraries (§7.4) (Motion through `MotionConfig`; anime.js count-ups write the final value; on the landing page the intro and the GSAP motion do not run and the four "how it works" beats are stacked)
+- [x] All error and empty states (§6)
 
 > ✅ **Checkpoint 4: "UI applied."**
 
 ### Phase 6: Landing + ship (Oct 12)
 
-- [ ] Landing page (§6 screen 1)
-- [ ] GSAP hero timeline + ScrollTrigger "how it works" and feature cards; anime.js logo tone marks (§7.3); GSAP loaded only on `/`
+- [x] Landing page (§6 screen 1)
+- [x] GSAP hero timeline + ScrollTrigger "how it works" and feature cards; anime.js logo tone marks (§7.3); GSAP loaded only on `/` (checked in the build: the GSAP chunks are fetched by the landing page on demand and are in no other page)
 - [ ] **#10** Test motion on a mid-range phone; trim or drop anime.js if janky
 - [ ] **Move to mainnet.** **#1** Get real USDC onto an Arc mainnet wallet (about 20–50 USDC); send 0.01 USDC to yourself
 - [ ] Re-check liquidity and confirm the three mainnet tier vaults (**#8**)
@@ -482,7 +482,7 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [ ] Switch the env vars to mainnet (Arch §9): chain ID, RPC URL, contract address, Circle mainnet key
 - [ ] Deploy web to Vercel (env vars from Arch §9), pointing at mainnet and the hosted Express
 - [ ] Production Supabase + indexer running; `/api/health` shows the indexer caught up
-- [ ] Phone-width check of every screen
+- [x] Phone-width check of every screen (done at 390 px on the testnet build: landing, portfolios, calculator, dashboard, new pot flow, pot page, both reviews, the menu and the connect, wrong-network and backend-down states; nothing overflows. To repeat on the mainnet deploy, and on a real phone for #10)
 
 ### Phase 7: Story (Oct 13)
 

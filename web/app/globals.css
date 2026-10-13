@@ -38,6 +38,8 @@
   --text-h1: 32px;       --text-h1--line-height: 40px;
   --text-display: 40px;  --text-display--line-height: 48px;
   --text-balance: 48px;  --text-balance--line-height: 56px;
+  /* The landing page only: the hero line and the three figures on black. It grows with the screen. */
+  --text-hero: clamp(4rem, 12.5vw, 11.5rem);  --text-hero--line-height: 0.92;
 
   --breakpoint-desktop: 1440px;  /* phone first, base width 390 */
 }
@@ -87,4 +89,18 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+}
+
+/* The landing page: what the logo intro and the scroll motion hide until they play.
+   A small script in the page sets these attributes on <html> before the first paint. */
+html[data-intro="seen"] [data-intro-screen] {
+  display: none;
+}
+
+html[data-motion="on"] [data-rise] {
+  opacity: 0;
+}
+
+html[data-motion="on"]:not([data-intro="seen"]) [data-nav-logo] [data-logo] {
+  opacity: 0;
 }

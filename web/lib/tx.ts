@@ -44,7 +44,7 @@ export async function estimateNetworkFee(
 async function confirm(hash: Hash, onSent?: OnSent): Promise<TransactionReceipt> {
   onSent?.(hash);
   const receipt = await waitForTransactionReceipt(wagmiConfig, { hash, chainId: chain.id });
-  if (receipt.status !== "success") throw new Error("The transaction failed. Nothing was moved.");
+  if (receipt.status !== "success") throw new Error("That didn’t go through. Your funds are safe.");
   return receipt;
 }
 

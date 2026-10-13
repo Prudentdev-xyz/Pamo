@@ -86,6 +86,13 @@ export default function NewPot({
   else if (target === null) goalProblem = "Enter a target in USDC, with up to 6 decimals.";
   else if (unlockAt === null || unlockAt <= BigInt(Math.floor(Date.now() / 1000))) goalProblem = "Pick an unlock date in the future.";
 
+  // A field the user has not reached yet is not an error: the button simply stays off.
+  const goalProblemShown =
+    goalProblem !== null &&
+    (name === ""
+      ? state.targetText !== "" || state.unlockDate !== ""
+      : nameTooLong || (target === null ? state.targetText.trim() !== "" : state.unlockDate !== ""));
+
   const overBalance = amount !== null && balance.data !== undefined && amount > balance.data;
   // While the amount is more than the wallet holds, the balance is re-read, so new USDC shows up without a reload.
   const refetchBalance = balance.refetch;
@@ -276,7 +283,7 @@ export default function NewPot({
                 onChange={(value) => dispatch({ type: "set", field: "unlockDate", value })}
                 hint="The goal unlocks when you reach the target or on this date, whichever comes first. There is no early withdrawal before that."
               />
-              {goalProblem && (state.name !== "" || state.targetText !== "" || state.unlockDate !== "") && (
+              {goalProblemShown && (
                 <p role="alert" className="text-label font-semibold text-error">
                   {goalProblem}
                 </p>

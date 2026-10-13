@@ -273,11 +273,8 @@ export default function PotDetail() {
                   </dl>
                 </Card>
                 <Card className="grid gap-3 p-5">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <h2 className="text-label font-bold">{tierName} rate</h2>
-                    <span className="text-caption text-grey-text">Last 7 days</span>
-                  </div>
-                  <RateChart tier={TIER_KEYS[pot.tier]!} />
+                  <h2 className="text-label font-bold">{tierName} rate</h2>
+                  <RateChart tier={TIER_KEYS[pot.tier]!} label="Last 7 days" />
                   <p className="text-caption text-grey-text">This is the vault’s rate, not your earnings.</p>
                 </Card>
               </div>

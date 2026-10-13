@@ -9,6 +9,7 @@ import { useVaults } from "@/lib/useVaults";
 import { warningMessage } from "@/lib/warnings";
 import { fade, list, rise } from "@/motion/variants";
 import { Banner } from "./Banner";
+import { Blank } from "./Blank";
 import { Card } from "./Card";
 import { ArrowRightIcon, ExternalIcon, WarningIcon } from "./Icon";
 import { LiveDot } from "./LiveDot";
@@ -69,7 +70,7 @@ export function Portfolios() {
                   ) : (
                     <>
                       <span aria-hidden="true" className="text-balance leading-14 font-bold text-grey-muted">
-                        —
+                        <Blank />
                       </span>
                       <span className="flex items-center gap-2 text-label text-grey-text">
                         <LiveDot live={false} />
@@ -83,13 +84,13 @@ export function Portfolios() {
                   <div className={rowClass}>
                     <dt className="shrink-0 text-grey-text">Run by</dt>
                     <dd className="min-w-0 text-right font-semibold [overflow-wrap:anywhere]">
-                      {loading ? <span className={`block h-4 w-24 ${skeleton}`} /> : vault ? (vault.curator ?? "Not reported") : "—"}
+                      {loading ? <span className={`block h-4 w-24 ${skeleton}`} /> : vault ? (vault.curator ?? "Not reported") : <Blank />}
                     </dd>
                   </div>
                   <div className={rowClass}>
                     <dt className="shrink-0 text-grey-text">Cash available now</dt>
                     <dd className="text-right font-semibold tabular-nums">
-                      {loading ? <span className={`block h-4 w-24 ${skeleton}`} /> : vault ? formatEstimate(Number(vault.liquidity)) : "—"}
+                      {loading ? <span className={`block h-4 w-24 ${skeleton}`} /> : vault ? formatEstimate(Number(vault.liquidity)) : <Blank />}
                     </dd>
                   </div>
                   {vault && (

@@ -8,7 +8,7 @@ const WIDTH = 300;
 const HEIGHT = 56;
 
 /** A portfolio's rate over the last week, as one quiet line. It shows the rate, never earnings. */
-export function RateChart({ tier }: { tier: TierKey }) {
+export function RateChart({ tier, label = "Rate, last 7 days" }: { tier: TierKey; label?: string }) {
   const history = useRateHistory(tier);
   const points = history.data ?? [];
   const ready = points.length >= 2;
@@ -29,7 +29,7 @@ export function RateChart({ tier }: { tier: TierKey }) {
   return (
     <div className="grid gap-2">
       <p className="flex justify-between gap-3 text-caption text-grey-text">
-        <span>Rate, last 7 days</span>
+        <span>{label}</span>
         {ready && <span className="tabular-nums">{range}</span>}
       </p>
       {history.isPending ? (
