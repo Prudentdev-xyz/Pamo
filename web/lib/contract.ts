@@ -14,6 +14,7 @@ export const pamoSavingsAbi = parseAbi([
   "function potValue(uint256 id) view returns (uint256)",
   "function isUnlocked(uint256 id) view returns (bool)",
   "function vaultFor(uint8 tier) view returns (address)",
+  "function paused() view returns (bool)",
   "function openPot(uint8 kind, uint8 tier, uint256 target, uint64 unlockAt, string name, uint256 assets) returns (uint256 id)",
   "function deposit(uint256 id, uint256 assets)",
   "function withdraw(uint256 id, uint256 assets)",

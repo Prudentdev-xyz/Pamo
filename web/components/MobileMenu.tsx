@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { formatUsdc, shortAddress } from "@/lib/format";
+import { useFocusTrap } from "@/lib/useFocusTrap";
 import { duration, ease } from "@/motion/tokens";
 import { ChainStatus } from "./ChainStatus";
 import { ChevronRightIcon, CloseIcon } from "./Icon";
@@ -34,6 +35,8 @@ export function MobileMenu({
   onDisconnect: () => void;
 }) {
   const closeButton = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  useFocusTrap(panel, open);
 
   useEffect(() => {
     if (!open) return;
@@ -53,6 +56,7 @@ export function MobileMenu({
     <AnimatePresence>
       {open && (
         <motion.div
+          ref={panel}
           role="dialog"
           aria-modal="true"
           aria-label="Menu"

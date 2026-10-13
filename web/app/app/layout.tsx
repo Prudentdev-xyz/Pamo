@@ -8,7 +8,7 @@ import { useConnect, useConnection, useConnectors, useDisconnect, useSwitchChain
 import { Banner } from "@/components/Banner";
 import { Button } from "@/components/Button";
 import { ChainStatus } from "@/components/ChainStatus";
-import { CalculatorIcon, HomeIcon, MenuIcon, PortfoliosIcon, WalletIcon, WarningIcon } from "@/components/Icon";
+import { AddIcon, CalculatorIcon, HomeIcon, MenuIcon, PortfoliosIcon, WalletIcon, WarningIcon } from "@/components/Icon";
 import { Logo } from "@/components/Logo";
 import { MobileMenu } from "@/components/MobileMenu";
 import { LevelMark } from "@/components/TierChip";
@@ -187,6 +187,16 @@ function SidebarPots({ connected, pathname }: { connected: boolean; pathname: st
             </Link>
           );
         })
+      )}
+      {connected && (
+        <Link
+          href="/app/new"
+          aria-current={pathname === "/app/new" ? "page" : undefined}
+          className={`${rowClass} text-black ${pathname === "/app/new" ? "bg-mint font-semibold hover:bg-mint" : ""}`}
+        >
+          <AddIcon size={18} />
+          New pot
+        </Link>
       )}
     </div>
   );

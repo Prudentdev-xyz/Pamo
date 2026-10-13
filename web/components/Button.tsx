@@ -23,22 +23,32 @@ export const buttonClass = (variant: Variant = "primary", size: Size = "md", cla
   `${base} ${variants[variant]} ${sizes[size]} ${className}`;
 
 interface Common {
+  /** A transaction is on its way: the button cannot be pressed but keeps its colour, so it does not look switched off. */
+  pending?: boolean;
   variant?: Variant;
   size?: Size;
   className?: string;
   children: ReactNode;
 }
 
-export function Button({ variant, size, className, children, ...rest }: Common & ButtonHTMLAttributes<HTMLButtonElement>) {
+const pendingClass = "disabled:bg-green! disabled:text-white! disabled:cursor-progress";
+
+export function Button({ variant, size, className = "", pending, children, ...rest }: Common & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button type="button" {...rest} className={buttonClass(variant, size, className)}>
+    <button
+      type="button"
+      {...rest}
+      disabled={rest.disabled || pending}
+      aria-busy={pending || undefined}
+      className={buttonClass(variant, size, `${className} ${pending ? pendingClass : ""}`)}
+    >
       {children}
     </button>
   );
 }
 
 /** A link that looks like a button, for actions that change the page. */
-export function ButtonLink({ href, variant, size, className, children }: Common & { href: string }) {
+export function ButtonLink({ href, variant, size, className, children }: Omit<Common, "pending"> & { href: string }) {
   return (
     <Link href={href} className={buttonClass(variant, size, className)}>
       {children}

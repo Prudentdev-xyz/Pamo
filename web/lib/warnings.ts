@@ -1,7 +1,7 @@
 const MESSAGES: Record<string, string> = {
   LOW_LIQUIDITY: "This vault is low on available cash. Withdrawals may have to wait.",
   VAULT_NOT_ACTIVE: "This vault is not working normally right now.",
-  VAULT_DATA_UNAVAILABLE: "Live vault data is unavailable. The amounts shown come straight from Arc.",
+  VAULT_DATA_UNAVAILABLE: "Live vault data is unavailable. The amounts shown come straight from the vault.",
   GOAL_LOCKED: "This goal is still locked.",
   EXCEEDS_VALUE: "That is more than this pot holds.",
 };

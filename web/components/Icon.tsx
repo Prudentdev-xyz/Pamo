@@ -1,8 +1,10 @@
 import {
   Add,
   ArrowCircleRight,
+  ArrowLeft,
   ArrowRight2,
   Calculator,
+  Calendar1,
   CloseCircle,
   Copy,
   ExportCurve,
@@ -12,8 +14,10 @@ import {
   ImportCurve,
   InfoCircle,
   Layer,
+  Lock1,
   Logout,
   TickCircle,
+  Unlock,
   Wallet2,
   Warning2,
   type Icon as IconsaxIcon,
@@ -42,6 +46,12 @@ export const CloseIcon = icon(CloseCircle);
 export const AddIcon = icon(Add);
 export const ArrowCircleIcon = icon(ArrowCircleRight);
 export const ChevronRightIcon = icon(ArrowRight2);
+export const BackIcon = icon(ArrowLeft);
+export const CalendarIcon = icon(Calendar1);
+/** A Goal Vault: locked until its target or its date. */
+export const LockIcon = icon(Lock1);
+/** An Anytime Vault: open whenever the owner wants. */
+export const UnlockIcon = icon(Unlock);
 export const InfoIcon = icon(InfoCircle);
 export const WarningIcon = icon(Warning2);
 export const CopyIcon = icon(Copy);

@@ -3,6 +3,8 @@
 import type { ReactNode } from "react";
 import { explorerTx } from "@/lib/chain";
 import type { Step } from "@/lib/useStep";
+import { Button } from "./Button";
+import { Spinner } from "./Spinner";
 
 /** One onchain button with its own pending state, explorer link and error. */
 export function StepButton({
@@ -18,22 +20,21 @@ export function StepButton({
 }) {
   const pending = step.status === "pending";
   return (
-    <div>
-      <button
-        type="button"
-        onClick={onClick}
-        disabled={disabled || pending}
-        className="rounded border border-black bg-black px-4 py-2 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-40"
-      >
+    <div className="grid gap-2">
+      <Button size="lg" onClick={onClick} disabled={disabled} pending={pending} className="w-full">
+        {pending && <Spinner />}
         {pending ? (step.hash ? "Confirming…" : "Check your wallet…") : children}
-      </button>
-      {step.hash && (
-        <a href={explorerTx(step.hash)} target="_blank" rel="noreferrer" className="ml-3 text-sm underline">
-          View on explorer
-        </a>
+      </Button>
+      {step.hash && pending && (
+        <p className="text-center text-caption text-grey-text">
+          Waiting for confirmation.{" "}
+          <a href={explorerTx(step.hash)} target="_blank" rel="noreferrer" className="font-semibold text-green underline">
+            View on explorer
+          </a>
+        </p>
       )}
       {step.status === "error" && (
-        <p role="alert" className="mt-2 text-sm">
+        <p role="alert" className="text-label text-error">
           {step.error}
         </p>
       )}

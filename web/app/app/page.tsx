@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "motion/react";
+import { useEffect, useState } from "react";
 import { Banner } from "@/components/Banner";
 import { ButtonLink } from "@/components/Button";
 import { CountUp } from "@/components/CountUp";
@@ -32,6 +33,9 @@ export default function Dashboard() {
   const activity = useOwnerActivity();
   const pots = usePots();
   const now = new Date();
+  // The save flow sends people back with ?new=<pot id>, so the pot they just opened stands out for a moment.
+  const [fresh, setFresh] = useState<string | null>(null);
+  useEffect(() => setFresh(new URLSearchParams(window.location.search).get("new")), []);
 
   if (pots.isPending) return <DashboardLoading />;
   if (pots.isError) {
@@ -145,8 +149,17 @@ export default function Dashboard() {
             <h2 className="text-body font-bold lg:text-h3">Your pots</h2>
             <motion.ul variants={list} initial="hidden" animate="visible" className="grid grid-cols-[minmax(0,1fr)] gap-3 md:grid-cols-2 lg:gap-4 xl:grid-cols-3">
               {pots.data.map((view) => (
-                <motion.li key={view.id.toString()} variants={rise} className="min-w-0">
+                <motion.li key={view.id.toString()} variants={rise} className="relative min-w-0">
                   <PotCard {...view} name={info.byId.get(view.id.toString())?.name} />
+                  {fresh === view.id.toString() && (
+                    <motion.span
+                      aria-hidden="true"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: 0 }}
+                      transition={{ duration: 1.6, ease: "easeOut", delay: 0.6 }}
+                      className="pointer-events-none absolute inset-0 rounded-card border-2 border-green bg-mint/60"
+                    />
+                  )}
                 </motion.li>
               ))}
             </motion.ul>
