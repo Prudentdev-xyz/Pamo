@@ -6,7 +6,7 @@
 [![Solidity](https://img.shields.io/badge/Solidity-0.8.30-363636?style=flat-square&logo=solidity)](contracts/src/PamoSavings.sol)
 [![Built with](https://img.shields.io/badge/built%20with-Arc%20Foundry-orange?style=flat-square)](https://docs.arc.io/arc/tutorials/install-arc-foundry)
 [![Testnet](https://img.shields.io/badge/Arc%20testnet-live%20%C2%B7%20verified-0B7A4B?style=flat-square)](https://explorer.testnet.arc.io/address/0x9952E937378bb093DFA010e94FC81D56EC4cBF17)
-[![Mainnet](https://img.shields.io/badge/Arc%20mainnet-pending-lightgrey?style=flat-square)](#deployments)
+[![Mainnet](https://img.shields.io/badge/Arc%20mainnet-live%20%C2%B7%20verified-0B7A4B?style=flat-square)](https://explorer.arc.io/address/0x72e63Db13C6b2c1e2c3C52216B4EBb88BCACB8eC)
 [![Web](https://img.shields.io/badge/web-Next.js%2016-black?style=flat-square&logo=nextdotjs)](web)
 
 ---
@@ -27,10 +27,10 @@ The name comes from the Yoruba *fi pamọ́*, "keep it safe".
 
 | Network | Chain ID | `PamoSavings` | Web app |
 |---|---|---|---|
-| Arc testnet | `5042002` | [`0x9952E937378bb093DFA010e94FC81D56EC4cBF17`](https://explorer.testnet.arc.io/address/0x9952E937378bb093DFA010e94FC81D56EC4cBF17) (source verified) | [pamosafe.vercel.app](https://pamosafe.vercel.app) |
-| Arc mainnet | `5042` | Pending | Pending |
+| Arc mainnet | `5042` | [`0x72e63Db13C6b2c1e2c3C52216B4EBb88BCACB8eC`](https://explorer.arc.io/address/0x72e63Db13C6b2c1e2c3C52216B4EBb88BCACB8eC) (source verified, deployed at block `25992804`) | [pamosafe.vercel.app](https://pamosafe.vercel.app) |
+| Arc testnet | `5042002` | [`0x9952E937378bb093DFA010e94FC81D56EC4cBF17`](https://explorer.testnet.arc.io/address/0x9952E937378bb093DFA010e94FC81D56EC4cBF17) (source verified) | Used during the build |
 
-The live site runs on Arc testnet today. The mainnet address and explorer link are added here once the mainnet deploy is done, and the site moves to mainnet with it.
+The live site runs on Arc mainnet with real USDC.
 
 ---
 
@@ -233,7 +233,7 @@ The savings earn by being lent out through a third-party vault. Pamo cannot veri
 
 A compromised admin key could pause new deposits, or point a tier at a different USDC vault for **new** pots. It could not move money already saved, and it could not stop withdrawals.
 
-On testnet the admin is a single key. The contract uses two-step ownership (`Ownable2Step`) and Safe is deployed on Arc, so the admin can be a multisig without a contract change.
+On mainnet and testnet the admin is a single key today. The contract uses two-step ownership (`Ownable2Step`) and Safe is deployed on Arc, so the admin can be a multisig without a contract change.
 
 ### 3.3 Backend trust
 
@@ -711,7 +711,7 @@ arc-cast send $PAMO "withdrawAll(uint256)" 1 \
 - [x] Arc testnet deployment, source verified
 - [x] Backend: live rates, quotes, event indexer, activity history
 - [x] Web app: dashboard, new pot flow, pot page, review screens, portfolios, growth calculator
-- [ ] Arc mainnet deployment with three live tier vaults
+- [x] Arc mainnet deployment with three live tier vaults, source verified
 - [ ] Multisig admin
 - [ ] Security audit
 - [ ] Recurring auto-save
@@ -753,6 +753,16 @@ MIT. See [LICENSE](LICENSE).
 | `MAX_NAME_LENGTH` | 64 bytes |
 | Arc testnet | chain ID `5042002`, RPC `https://rpc.testnet.arc.io`, explorer `https://explorer.testnet.arc.io` |
 | Arc mainnet | chain ID `5042`, RPC `https://rpc.mainnet.arc.io`, explorer `https://explorer.arc.io` |
+
+### Mainnet tier vaults
+
+Morpho USDC vaults on Arc mainnet, all with 18 share decimals.
+
+| Tier | Vault |
+|---|---|
+| Calm | Steakhouse Prime USDC `0xbeef0016cb2fd5c352ea7ca08a9f54739dfa7298` |
+| Steady | Keyrock Prime USDC `0x5befab92a5a3d60f578cb51eeb4e4fd50a1e3123` |
+| Bold | Bitwise Premium RWA USDC `0x7610094b846657dcf166d59e42973db52c7015f9` |
 
 ### Testnet tier vaults
 

@@ -65,6 +65,7 @@ The Earn Kit is Pamo's **window** onto the vaults. The contract is the **hands**
 | USDC (both networks) | `0x3600000000000000000000000000000000000000`, **6 decimals** via ERC-20 |
 | Multicall3 | `0xcA11bde05977b3631167028862bE2a173976CA11` |
 | Testnet faucet | `https://faucet.circle.com` |
+| **PamoSavings on mainnet** | `0x72e63Db13C6b2c1e2c3C52216B4EBb88BCACB8eC`, verified, deployed at block `25992804`, admin `0xeF07E3a16dca43BCe77Db728b6600fDbAf6af40F` (one key) |
 | **PamoSavings on testnet** | `0x9952E937378bb093DFA010e94FC81D56EC4cBF17`, verified, deployed at block `66067781` |
 | Testnet vault: EarnKit USDC Vault | `0xaabbef1d3971c710276ed41ec791bbe14cdb8e88`, shares have 18 decimals |
 | Testnet vault: MockMorphoVault | `0x8f2d33b5d4b9b5f02df635ae308f7b4c9da8d2dc`, shares have **6** decimals |
@@ -178,7 +179,7 @@ Run with `arc-forge test --network arc`. Plain Foundry cannot move USDC on an Ar
 - [x] Approvals are **exact amounts only**, in the contract (`forceApprove(vault, assets)`, done and tested) and in the frontend (never `type(uint256).max`). Result: the web app has one approve call, `allowUsdc` in `web/lib/tx.ts`, and it approves the amount being saved.
 - [x] CEI order + `nonReentrant` on every function that calls the vault (withdrawals update state before calling the vault).
 - [ ] **Admin key:** `pause` and `setTierVault` sit with one key. ethskills flags a single key as a censorship risk. Pause only blocks new deposits (withdrawals always work), which limits it; still, move ownership to a multisig (e.g. Safe, if deployed on Arc) or add a timelock on `setTierVault` when possible, and say so in the README. Checked Oct 12: Safe v1.4.1 is deployed on Arc mainnet and testnet (factory `0x4e1DCf7AD4e460CfD30791CCC4F9c8a4f820ec67`, source verified on the mainnet explorer) and the Safe app lists both networks, so a multisig needs no contract change. `PamoSavings` is `Ownable2Step` and the deploy script takes `OWNER`, so the mainnet deploy can name the Safe as admin from the first block. Still to do at the mainnet deploy: create the Safe and deploy with `OWNER` set to it (decision in §10). The README says the admin is one key today.
-- [ ] Source verified on the explorer right after deploy. Testnet: done. Mainnet: the explorer is Blockscout too, so the verifier URL is `https://explorer.arc.io/api/` (answers #5). It sits behind Cloudflare and refused a plain `curl` with 403 while accepting a browser-style request, so `arc-forge verify-contract` may be refused; the fallback is to upload the standard JSON input on the explorer's verify page. The command is in `contracts/README.md`.
+- [x] Source verified on the explorer right after deploy. Testnet: done. Mainnet: done (Oct 14; `arc-forge verify-contract` was refused by Cloudflare, the explorer API at `/api/v2/smart-contracts/<address>/verification/via/standard-input` accepted a browser-style request). The explorer is Blockscout too, so the verifier URL is `https://explorer.arc.io/api/` (answers #5). It sits behind Cloudflare and refused a plain `curl` with 403 while accepting a browser-style request, so `arc-forge verify-contract` may be refused; the fallback is to upload the standard JSON input on the explorer's verify page. The command is in `contracts/README.md`.
 
 ---
 
@@ -475,21 +476,21 @@ Re-dated on **Oct 8**: Phase 0 is done and the contract is next. Tasks are order
 - [x] Landing page (§6 screen 1)
 - [x] GSAP hero timeline + ScrollTrigger "how it works" and feature cards; anime.js logo tone marks (§7.3); GSAP loaded only on `/` (checked in the build: the GSAP chunks are fetched by the landing page on demand and are in no other page)
 - [ ] **#10** Test motion on a mid-range phone; trim or drop anime.js if janky
-- [ ] **Move to mainnet.** **#1** Get real USDC onto an Arc mainnet wallet (about 20–50 USDC); send 0.01 USDC to yourself
-- [ ] Re-check liquidity and confirm the three mainnet tier vaults (**#8**)
-- [ ] **#5** Find the mainnet verifier URL (found: `https://explorer.arc.io/api/`, see §4; not yet tried with `arc-forge`); **deploy `PamoSavings` to Arc mainnet** and verify the source
-- [ ] With `arc-cast` on mainnet: open a pot, deposit 1 USDC, withdraw it
-- [ ] Switch the env vars to mainnet (Arch §9): chain ID, RPC URL, contract address, Circle mainnet key
-- [ ] Deploy web to Vercel (env vars from Arch §9), pointing at mainnet and the hosted Express (live on testnet at `https://pamosafe.vercel.app`, deployed before the mainnet move so the phone checks have a public URL; still to repoint at mainnet)
-- [ ] Production Supabase + indexer running; `/api/health` shows the indexer caught up
+- [x] **Move to mainnet.** **#1** Get real USDC onto an Arc mainnet wallet (done with 5 USDC, which covered the deploy and the tests)
+- [x] Re-check liquidity and confirm the three mainnet tier vaults (**#8**): Calm = Steakhouse Prime USDC, Steady = Keyrock Prime USDC, Bold = Bitwise Premium RWA USDC
+- [x] **#5** Find the mainnet verifier URL; **deploy `PamoSavings` to Arc mainnet** and verify the source (`0x72e63Db13C6b2c1e2c3C52216B4EBb88BCACB8eC`, block `25992804`)
+- [x] With `cast` on mainnet: open a pot, deposit 1 USDC, withdraw it (pot #1: open with 0.5, deposit 0.5, withdraw 0.2, withdraw all; the contract held 0 USDC after)
+- [x] Switch the env vars to mainnet (Arch §9): chain ID, RPC URL, contract address, deploy block
+- [x] Deploy web to Vercel (env vars from Arch §9), pointing at mainnet and the hosted Express (`https://pamosafe.vercel.app`, on mainnet since Oct 14)
+- [x] Production Supabase + indexer running; `/api/health` shows the indexer caught up (testnet rows cleared, indexer restarted from the deploy block, pot #1 indexed)
 - [x] Phone-width check of every screen (done at 390 px on the testnet build: landing, portfolios, calculator, dashboard, new pot flow, pot page, both reviews, the menu and the connect, wrong-network and backend-down states; nothing overflows. To repeat on the mainnet deploy, and on a real phone for #10)
 
 ### Phase 7: Story (Oct 13)
 
-- [x] README: what Pamo is, live URL, contract address + explorer link, architecture diagram (from Arch §2), how to run, roadmap (written with the testnet URL and address; the mainnet address and explorer link go in after the deploy)
+- [x] README: what Pamo is, live URL, contract address + explorer link, architecture diagram (from Arch §2), how to run, roadmap (mainnet address, explorer link and tier vaults added after the deploy)
 - [x] Redraw `pamo-pseudocode.png` first (it shows an older design: tier per user, `apy / 12`), then add it to the README
 - [ ] Record a 2–3 minute demo video: problem → save → goal → calculator → explorer proof
-- [ ] Draft the DoraHacks submission; attach `Brand Kit & Design/Pamo_Spec_Arc.pdf`
+- [x] Draft the DoraHacks submission (`Docs/Submission_Draft.md`); attach `Brand Kit & Design/Pamo_Spec_Arc.pdf`
 
 > ✅ **Checkpoint 5: "Polish done."**
 

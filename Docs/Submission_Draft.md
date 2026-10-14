@@ -1,6 +1,6 @@
 # Pamo: DoraHacks submission draft
 
-A draft to edit. Lines marked **[fill in]** wait on the mainnet deploy or on you. The form's own field names may differ; move the text to wherever it fits.
+A draft to edit. Lines marked **[fill in]** wait on you. The form's own field names may differ; move the text to wherever it fits.
 
 ---
 
@@ -49,8 +49,8 @@ Most people who hold USDC let it sit idle. Earning yield onchain today means fin
 
 ## Links
 
-- **Live app:** **[fill in after the mainnet deploy]** (testnet build: https://pamosafe.vercel.app)
-- **Contract on Arc mainnet:** **[fill in: address + explorer link]**
+- **Live app (Arc mainnet):** https://pamosafe.vercel.app
+- **Contract on Arc mainnet:** `0x72e63Db13C6b2c1e2c3C52216B4EBb88BCACB8eC`, source verified: https://explorer.arc.io/address/0x72e63Db13C6b2c1e2c3C52216B4EBb88BCACB8eC
 - **Contract on Arc testnet:** https://explorer.testnet.arc.io/address/0x9952E937378bb093DFA010e94FC81D56EC4cBF17
 - **Repository:** https://github.com/Prudentdev-xyz/Pamo
 - **Demo video:** **[fill in]**
@@ -61,7 +61,7 @@ Most people who hold USDC let it sit idle. Earning yield onchain today means fin
 - Rates are live and labelled as today's rate, even at 0%.
 - The savings are lent out through third-party vaults. A vault can be short on cash, which can delay a withdrawal. The review screen warns first.
 - The contract has not been audited.
-- **[fill in: one key or a multisig as admin on mainnet]**
+- The admin is one key today. Ownership moves in two steps, so it can go to a Safe multisig on Arc without a contract change.
 
 ## What comes next
 
